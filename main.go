@@ -20,8 +20,8 @@ func main() {
 		Title:     "Go Image Processing",
 		Width:     1024,
 		Height:    768,
-		MinWidth:  600,
-		MinHeight: 500,
+		MinWidth:  800,
+		MinHeight: 600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
