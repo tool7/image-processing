@@ -1,23 +1,27 @@
 <script lang="ts" setup>
 import { reactive } from "vue";
 import Navbar from "./components/Navbar.vue";
-import ImageFileSelector from "./components/ImageFileSelector.vue";
 import ImageViewer from "./components/ImageViewer.vue";
+import { OpenImageFileSelector, ProccessImage } from "../wailsjs/go/main/App";
+import { main } from "../wailsjs/go/models";
 
 interface AppState {
-  selectedImageData?: ImageData;
+  processedImage?: main.ProcessedImage;
 }
 
 const state = reactive<AppState>({
-  selectedImageData: undefined,
+  processedImage: undefined,
 });
 
-const onImageSelect = (image: ImageData) => {
-  state.selectedImageData = image;
+const onSelectImage = async () => {
+  await OpenImageFileSelector();
+
+  const result = await ProccessImage();
+  state.processedImage = result;
 };
 
 const onClearImage = () => {
-  state.selectedImageData = undefined;
+  state.processedImage = undefined;
 };
 </script>
 
@@ -26,8 +30,13 @@ const onClearImage = () => {
     <Navbar />
 
     <main>
-      <ImageFileSelector v-if="!state.selectedImageData" @image-select="onImageSelect" />
-      <ImageViewer v-else :image-data="state.selectedImageData" />
+      <v-btn v-if="!state.processedImage" color="success" variant="flat" @click="onSelectImage"> Select Image </v-btn>
+      <ImageViewer
+        v-else
+        :width="state.processedImage.width"
+        :height="state.processedImage.height"
+        :base64="state.processedImage.base64"
+      />
 
       <v-btn color="warning" variant="tonal" size="small" @click="onClearImage">Clear Image</v-btn>
     </main>

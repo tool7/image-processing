@@ -4,6 +4,8 @@ import (
 	"errors"
 	"image"
 	"image/color"
+	_ "image/jpeg"
+	_ "image/png"
 	"math"
 	"os"
 	"runtime"

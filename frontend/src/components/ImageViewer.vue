@@ -1,24 +1,44 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 const canvasRef = ref<HTMLCanvasElement>();
 
 const props = defineProps({
-  imageData: {
-    type: Object,
+  width: {
+    type: Number,
+    required: true,
+  },
+  height: {
+    type: Number,
+    required: true,
+  },
+  base64: {
+    type: String,
     required: true,
   },
 });
 
+const renderImage = () => {
+  const img = new Image();
+  img.src = props.base64;
+
+  // TODO: Find out why this is required for successful render
+  setTimeout(() => {
+    const ctx = canvasRef.value!.getContext("2d");
+    ctx!.drawImage(img, 0, 0);
+  }, 0);
+};
+
 onMounted(() => {
-  const ctx = canvasRef.value!.getContext("2d");
-  ctx!.putImageData(props.imageData as ImageData, 0, 0);
+  renderImage();
 });
+
+watch(props, renderImage);
 </script>
 
 <template>
   <div id="image-viewer">
-    <canvas ref="canvasRef" :width="props.imageData.width" :height="props.imageData.height"></canvas>
+    <canvas ref="canvasRef" :width="props.width" :height="props.height"></canvas>
   </div>
 </template>
 
