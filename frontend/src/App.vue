@@ -3,19 +3,11 @@ import Navbar from "./components/Navbar.vue";
 import ImageViewer from "./components/ImageViewer.vue";
 import { useImageProcessing } from "./composables/image-processing";
 
-const { openImageFileSelector, processedImage, resetAppState, isLoading } = useImageProcessing();
+const { openImageFileSelector, processedImage, isLoading } = useImageProcessing();
 
 const onSelectImage = async () => {
   try {
-    openImageFileSelector();
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const onResetAll = async () => {
-  try {
-    resetAppState();
+    await openImageFileSelector();
   } catch (err) {
     console.log(err);
   }
@@ -46,7 +38,6 @@ const onResetAll = async () => {
 
       <div v-if="processedImage && !isLoading">
         <ImageViewer :width="processedImage.width" :height="processedImage.height" :base64="processedImage.base64" />
-        <v-btn color="warning" variant="tonal" size="small" @click="onResetAll">Reset All</v-btn>
       </div>
     </main>
   </div>

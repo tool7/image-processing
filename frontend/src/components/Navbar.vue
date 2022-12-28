@@ -11,7 +11,7 @@ interface MenuItem {
   onClick: () => void;
 }
 
-const { processedImage, isLoading } = useImageProcessing();
+const { processedImage, resetAppState, isLoading } = useImageProcessing();
 const { loadProject, saveProject, exportPng } = useFileManager();
 
 const onMinimise = () => WindowMinimise();
@@ -37,6 +37,12 @@ const menuItems = computed<Array<MenuItem>>(() => {
       icon: "fas fa-file-image",
       isEnabled: Boolean(processedImage.value) && !isLoading.value,
       onClick: () => exportPng(),
+    },
+    {
+      title: "Reset All",
+      icon: "fas fa-trash-can",
+      isEnabled: !isLoading.value,
+      onClick: () => resetAppState(),
     },
   ];
 });
