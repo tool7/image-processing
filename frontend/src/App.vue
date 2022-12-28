@@ -1,57 +1,73 @@
 <script lang="ts" setup>
-import { reactive } from "vue";
 import Navbar from "./components/Navbar.vue";
 import ImageViewer from "./components/ImageViewer.vue";
-import { OpenImageFileSelector, ProccessImage } from "../wailsjs/go/main/App";
-import { main } from "../wailsjs/go/models";
+import { useImageProcessing } from "./composables/image-processing";
 
-interface AppState {
-  processedImage?: main.ProcessedImage;
-}
-
-const state = reactive<AppState>({
-  processedImage: undefined,
-});
+const { openImageFileSelector, processedImage, resetAppState, isLoading } = useImageProcessing();
 
 const onSelectImage = async () => {
-  await OpenImageFileSelector();
-
-  const result = await ProccessImage();
-  state.processedImage = result;
+  try {
+    openImageFileSelector();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-const onClearImage = () => {
-  state.processedImage = undefined;
+const onResetAll = async () => {
+  try {
+    resetAppState();
+  } catch (err) {
+    console.log(err);
+  }
 };
 </script>
 
 <template>
-  <div id="app-container">
-    <Navbar />
+  <div class="h-100 w-100">
+    <Navbar id="navbar" />
 
-    <main>
-      <v-btn v-if="!state.processedImage" color="success" variant="flat" @click="onSelectImage"> Select Image </v-btn>
-      <ImageViewer
-        v-else
-        :width="state.processedImage.width"
-        :height="state.processedImage.height"
-        :base64="state.processedImage.base64"
-      />
-
-      <v-btn color="warning" variant="tonal" size="small" @click="onClearImage">Clear Image</v-btn>
+    <div v-if="!processedImage && isLoading" class="h-100 w-100 d-flex justify-center align-center">
+      <v-progress-linear id="loading-indicator" class="mt-8" indeterminate color="yellow-darken-2" />
+      <span>Please wait for image to load...</span>
+    </div>
+    <main v-else class="h-100 w-100">
+      <v-btn
+        v-if="!processedImage"
+        id="select-image-btn"
+        variant="tonal"
+        size="x-large"
+        prepend-icon="fas fa-image"
+        @click="onSelectImage"
+      >
+        Select image to begin
+      </v-btn>
+      <div v-else>
+        <ImageViewer :width="processedImage.width" :height="processedImage.height" :base64="processedImage.base64" />
+        <v-btn color="warning" variant="tonal" size="small" @click="onResetAll">Reset All</v-btn>
+      </div>
     </main>
   </div>
 </template>
 
 <style scoped>
-#app-container {
-  width: 100%;
-  height: 100%;
+#navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+#loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 main {
-  width: 100%;
-  height: 70%;
-  padding: 20px;
+  padding: 52px 20px 20px 20px;
+}
+
+#select-image-btn {
+  top: 50%;
+  transform: translateY(-50%);
 }
 </style>

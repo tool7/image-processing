@@ -31,7 +31,7 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) OpenImageFileSelector() {
+func (a *App) OpenImageFileSelector() bool {
 	filePath, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Select Image File (PNG or JPG)",
 		Filters: []runtime.FileFilter{
@@ -42,8 +42,12 @@ func (a *App) OpenImageFileSelector() {
 		},
 	})
 
-	if err != nil || filePath == "" {
+	if err != nil {
 		panic("Error on image file selection")
+	}
+
+	if filePath == "" {
+		return false
 	}
 
 	img, err := utils.GetImageFromFilePath(filePath)
@@ -52,6 +56,7 @@ func (a *App) OpenImageFileSelector() {
 	}
 
 	a.originalImage = img
+	return true
 }
 
 func (a *App) ProccessImage() ProcessedImage {

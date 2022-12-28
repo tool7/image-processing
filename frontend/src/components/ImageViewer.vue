@@ -37,20 +37,12 @@ watch(props, renderImage);
 </script>
 
 <template>
-  <div id="image-viewer">
+  <div class="h-100 w-100 d-flex justify-center align-center">
     <canvas ref="canvasRef" :width="props.width" :height="props.height"></canvas>
   </div>
 </template>
 
 <style scoped>
-#image-viewer {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 canvas {
   max-width: 100%;
   max-height: 100%;
