@@ -1,14 +1,70 @@
 <script lang="ts" setup>
-import { WindowMinimise, WindowToggleMaximise, Quit, WindowIsMaximised } from "../../wailsjs/runtime/runtime";
+import { computed } from "vue";
+import { WindowMinimise, WindowToggleMaximise, Quit } from "../../wailsjs/runtime/runtime";
+import { useFileManager } from "../composables/file-manager";
+import { useImageProcessing } from "../composables/image-processing";
+
+interface MenuItem {
+  title: string;
+  icon: string;
+  isEnabled: boolean;
+  onClick: () => void;
+}
+
+const { processedImage, isLoading } = useImageProcessing();
+const { loadProject, saveProject, exportPng } = useFileManager();
 
 const onMinimise = () => WindowMinimise();
 const onToggleMaximise = () => WindowToggleMaximise();
 const onQuit = () => Quit();
+
+const menuItems = computed<Array<MenuItem>>(() => {
+  return [
+    {
+      title: "Load Project",
+      icon: "fas fa-file-import",
+      isEnabled: !isLoading.value,
+      onClick: () => loadProject(),
+    },
+    {
+      title: "Save Project",
+      icon: "fas fa-floppy-disk",
+      isEnabled: Boolean(processedImage.value) && !isLoading.value,
+      onClick: () => saveProject(),
+    },
+    {
+      title: "Export PNG",
+      icon: "fas fa-file-image",
+      isEnabled: Boolean(processedImage.value) && !isLoading.value,
+      onClick: () => exportPng(),
+    },
+  ];
+});
 </script>
 
 <template>
   <div id="navbar" style="--wails-draggable: drag">
-    <span id="title">Go Image Processing</span>
+    <v-menu>
+      <template v-slot:activator="{ props }">
+        <v-btn icon="fas fa-ellipsis-vertical" v-bind="props" size="x-small" variant="tonal" :rounded="0"></v-btn>
+      </template>
+
+      <v-list>
+        <v-list-item
+          v-for="(menuItem, i) in menuItems"
+          :key="i"
+          class="menu-item"
+          @click="() => menuItem.onClick()"
+          :disabled="!menuItem.isEnabled"
+        >
+          <template v-slot:prepend>
+            <v-icon :icon="menuItem.icon" size="small"></v-icon>
+          </template>
+
+          <v-list-item-title class="text-left mr-4">{{ menuItem.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
     <div>
       <v-btn
@@ -58,12 +114,9 @@ const onQuit = () => Quit();
   margin: auto;
 }
 
-#title {
-  padding: 10px;
-  text-align: center;
-  color: var(--color-white);
-  cursor: default;
-  user-select: none;
+.menu-item:hover {
+  cursor: pointer;
+  background-color: var(--color-light-grey);
 }
 
 #btn-quit:hover {

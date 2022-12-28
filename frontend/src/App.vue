@@ -26,13 +26,15 @@ const onResetAll = async () => {
   <div class="h-100 w-100">
     <Navbar id="navbar" />
 
-    <div v-if="!processedImage && isLoading" class="h-100 w-100 d-flex justify-center align-center">
-      <v-progress-linear id="loading-indicator" class="mt-8" indeterminate color="yellow-darken-2" />
-      <span>Please wait for image to load...</span>
-    </div>
-    <main v-else class="h-100 w-100">
+    <v-progress-linear v-if="isLoading" id="loading-indicator" class="mt-8" indeterminate color="yellow-darken-2" />
+
+    <main class="h-100 w-100">
+      <div v-if="!processedImage && isLoading" class="h-100 w-100 d-flex justify-center align-center">
+        <h3>Please wait for image to load...</h3>
+      </div>
+
       <v-btn
-        v-if="!processedImage"
+        v-if="!processedImage && !isLoading"
         id="select-image-btn"
         variant="tonal"
         size="x-large"
@@ -41,7 +43,8 @@ const onResetAll = async () => {
       >
         Select image to begin
       </v-btn>
-      <div v-else>
+
+      <div v-if="processedImage && !isLoading">
         <ImageViewer :width="processedImage.width" :height="processedImage.height" :base64="processedImage.base64" />
         <v-btn color="warning" variant="tonal" size="small" @click="onResetAll">Reset All</v-btn>
       </div>
