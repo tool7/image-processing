@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
 	"image"
 	"image/png"
 
@@ -21,6 +22,50 @@ type ProcessedImage struct {
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 	Base64 string `json:"base64"`
+}
+
+type ImageOperationType int
+
+const (
+	Brightness ImageOperationType = iota
+	Contrast
+	Saturation
+	Tint
+	Greyscale
+	Negative
+	Sepia
+	Emboss
+	EdgesVertical
+	EdgesHorizontal
+	MirrorVertical
+	MirrorHorizontal
+	RotateBy90
+	RotateBy180
+	RotateBy270
+)
+
+func (o ImageOperationType) String() string {
+	return [...]string{
+		"brightness",
+		"contrast",
+		"saturation",
+		"tint",
+		"greyscale",
+		"negative",
+		"sepia",
+		"emboss",
+		"edges-vertical",
+		"edges-horizontal",
+		"mirror-vertical",
+		"mirror-horizontal",
+		"rotate-90",
+		"rotate-180",
+		"rotate-270",
+	}[o]
+}
+
+type ImageOperation struct {
+	Type ImageOperationType `json:"type"`
 }
 
 func NewApp() *App {
@@ -72,4 +117,10 @@ func (a *App) ProccessImage() ProcessedImage {
 		Height: a.originalImage.Bounds().Max.Y - a.originalImage.Bounds().Min.Y,
 		Base64: base64String,
 	}
+}
+
+func (a *App) AddImageOperation(operation ImageOperation) bool {
+	fmt.Println(operation.Type.String())
+
+	return true
 }
