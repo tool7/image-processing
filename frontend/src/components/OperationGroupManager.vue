@@ -7,7 +7,7 @@ import OperationBuilder from "./OperationBuilder.vue";
 import { useImageProcessing } from "../composables/image-processing";
 import { Color, imageOperationSelectItems, ImageOperationType } from "../types/image";
 
-const { addImageOperation, processImage } = useImageProcessing();
+const { addImageOperation, removeImageOperation, processImage } = useImageProcessing();
 
 const operations = ref<Array<{ id: number; operation: main.ImageOperation }>>([]);
 
@@ -39,8 +39,15 @@ const onAddOperation = async (operationType: ImageOperationType) => {
   }
 };
 
-const onRemoveOperation = (index: number) => {
-  console.log(index);
+const onRemoveOperation = async (index: number) => {
+  try {
+    await removeImageOperation(index);
+    operations.value.splice(index, 1);
+
+    await processImage();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const onOperationChange = async (index: number, type: ImageOperationType, level?: number, tint?: Color) => {

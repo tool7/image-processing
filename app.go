@@ -125,7 +125,7 @@ func (a *App) ProcessImage() ProcessedImage {
 	}
 }
 
-func (a *App) AppendImageOperation(operation ImageOperation) bool {
+func (a *App) AppendImageOperation(operation ImageOperation) error {
 	switch operation.Type {
 	case Brightness:
 		brightnessOperation := operations.NewBrightnessOperation(operation.Level)
@@ -189,5 +189,11 @@ func (a *App) AppendImageOperation(operation ImageOperation) bool {
 	fmt.Println("=================================== AppendImageOperation")
 	fmt.Println(a.imageLayerCollection.Size)
 
-	return true
+	return nil
+}
+
+func (a *App) RemoveImageOperationAtIndex(index int) error {
+	a.imageLayerCollection.RemoveAt(index)
+
+	return nil
 }

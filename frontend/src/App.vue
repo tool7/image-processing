@@ -19,7 +19,14 @@ const onSelectImage = async () => {
   <div class="h-100 w-100">
     <Navbar id="navbar" />
 
-    <v-progress-linear v-if="isLoading" id="loading-indicator" class="mt-8" indeterminate color="yellow-darken-2" />
+    <v-progress-linear
+      v-if="isLoading"
+      id="loading-indicator"
+      :height="1"
+      color="blue-lighten-3"
+      indeterminate
+      class="mt-8"
+    />
 
     <div v-if="!processedImage && isLoading" class="h-100 w-100 d-flex justify-center align-center">
       <h3>Please wait for image to load...</h3>

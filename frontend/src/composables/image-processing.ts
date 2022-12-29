@@ -1,6 +1,11 @@
 import { ref, readonly } from "vue";
 import { main } from "../../wailsjs/go/models";
-import { OpenImageFileSelector, ProcessImage, AppendImageOperation } from "../../wailsjs/go/main/App";
+import {
+  OpenImageFileSelector,
+  ProcessImage,
+  AppendImageOperation,
+  RemoveImageOperationAtIndex,
+} from "../../wailsjs/go/main/App";
 
 const isLoading = ref<boolean>(false);
 const processedImage = ref<main.ProcessedImage | undefined>();
@@ -36,6 +41,10 @@ const addImageOperation = async (operation: main.ImageOperation) => {
   await AppendImageOperation(operation);
 };
 
+const removeImageOperation = async (index: number) => {
+  await RemoveImageOperationAtIndex(index);
+};
+
 const processImage = async () => {
   setIsLoading(true);
 
@@ -60,6 +69,7 @@ export function useImageProcessing() {
     processedImage: readonly(processedImage),
     openImageFileSelector,
     addImageOperation,
+    removeImageOperation,
     processImage,
     resetAppState,
   };

@@ -13,3 +13,7 @@ export function OpenImageFileSelector() {
 export function ProcessImage() {
   return window['go']['main']['App']['ProcessImage']();
 }
+
+export function RemoveImageOperationAtIndex(arg1) {
+  return window['go']['main']['App']['RemoveImageOperationAtIndex'](arg1);
+}
