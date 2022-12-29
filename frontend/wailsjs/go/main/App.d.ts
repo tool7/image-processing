@@ -9,3 +9,9 @@ export function OpenImageFileSelector():Promise<boolean>;
 export function ProcessImage():Promise<main.ProcessedImage>;
 
 export function RemoveImageOperationAtIndex(arg1:number):Promise<Error>;
+
+export function ReplaceImageOperationAtIndex(arg1:number,arg2:main.ImageOperation):Promise<Error>;
+
+export function ResetAppState():Promise<void>;
+
+export function UpdateImageOperationAtIndex(arg1:number,arg2:main.ImageOperation):Promise<Error>;

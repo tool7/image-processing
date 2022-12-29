@@ -8,7 +8,7 @@ import (
 )
 
 type BrightnessOperation struct {
-	level float64
+	Level float64
 }
 
 func NewBrightnessOperation(level float64) *BrightnessOperation {
@@ -25,9 +25,9 @@ func (this *BrightnessOperation) Execute(inputImage *image.RGBA) (*image.RGBA, e
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
 				R, G, B, A := utils.GetPixelColor(inputImage, x, y)
 
-				newR := utils.ClipColorChannel(float64(R) * this.level)
-				newG := utils.ClipColorChannel(float64(G) * this.level)
-				newB := utils.ClipColorChannel(float64(B) * this.level)
+				newR := utils.ClipColorChannel(float64(R) * this.Level)
+				newG := utils.ClipColorChannel(float64(G) * this.Level)
+				newB := utils.ClipColorChannel(float64(B) * this.Level)
 
 				chunkResult.SetRGBA(x, y, color.RGBA{newR, newG, newB, A})
 			}

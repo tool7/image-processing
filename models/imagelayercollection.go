@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"image"
-	"math"
 )
 
 // Linked list data structure for handling image layers
@@ -19,6 +18,20 @@ func (this *ImageLayerCollection) validateIndex(index int) bool {
 		return false
 	}
 	return true
+}
+
+func (this *ImageLayerCollection) At(index int) (*ImageLayer, error) {
+	ok := this.validateIndex(index)
+	if !ok {
+		return nil, errors.New("Invalid index")
+	}
+
+	current := this.Head
+	for count := 0; count < index; count++ {
+		current = current.Next
+	}
+
+	return current, nil
 }
 
 func (this *ImageLayerCollection) Append(imageLayer *ImageLayer) {
@@ -39,6 +52,11 @@ func (this *ImageLayerCollection) Append(imageLayer *ImageLayer) {
 }
 
 func (this *ImageLayerCollection) InsertAt(imageLayer *ImageLayer, index int) error {
+	if this.Size == index {
+		this.Append(imageLayer)
+		return nil
+	}
+
 	ok := this.validateIndex(index)
 	if !ok {
 		return errors.New("Invalid index")
@@ -65,63 +83,6 @@ func (this *ImageLayerCollection) InsertAt(imageLayer *ImageLayer, index int) er
 	previous.Next = imageLayer
 
 	this.Size++
-	return nil
-}
-
-func (this *ImageLayerCollection) Swap(indexA, indexB int) error {
-	if indexA == indexB {
-		return errors.New("Index A and B must be different")
-	}
-	ok := this.validateIndex(indexA)
-	if !ok {
-		return errors.New("Invalid index A")
-	}
-	ok = this.validateIndex(indexB)
-	if !ok {
-		return errors.New("Invalid index B")
-	}
-
-	var pointerToLayerA *ImageLayer
-	layerA := this.Head
-	for count := 0; count < indexA; count++ {
-		pointerToLayerA = layerA
-		layerA = layerA.Next
-	}
-
-	var pointerToLayerB *ImageLayer
-	layerB := this.Head
-	for count := 0; count < indexB; count++ {
-		pointerToLayerB = layerB
-		layerB = layerB.Next
-	}
-
-	// If "pointerToLayerA" is nil, it means that "indexA" is 0,
-	// which implies that "layerA" is HEAD so HEAD must be set to "layerB".
-	if pointerToLayerA == nil {
-		this.Head = layerB
-	} else {
-		pointerToLayerA.Next = layerB
-	}
-	// If "pointerToLayerB" is nil, it means that "indexB" is 0,
-	// which implies that "layerB" is HEAD so HEAD must be set to "layerA".
-	if pointerToLayerB == nil {
-		this.Head = layerA
-	} else {
-		pointerToLayerB.Next = layerA
-	}
-
-	layerATraget := layerA.Next
-	layerBTraget := layerB.Next
-	layerA.Next = layerBTraget
-	layerB.Next = layerATraget
-
-	// Updating "OutputImages" map
-	minIndex := int(math.Min(float64(indexA), float64(indexB)))
-	for minIndex < this.Size {
-		delete(this.OutputImages, minIndex)
-		minIndex++
-	}
-
 	return nil
 }
 

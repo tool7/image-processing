@@ -9,7 +9,7 @@ import (
 )
 
 type SaturationOperation struct {
-	level float64
+	Level float64
 }
 
 func NewSaturationOperation(level float64) *SaturationOperation {
@@ -32,7 +32,7 @@ func (this *SaturationOperation) Execute(inputImage *image.RGBA) (*image.RGBA, e
 					B: float64(B)}.Hsv()
 				saturation := utils.ClipColorChannel(normalizedSaturation * 255)
 
-				increasedSaturation := utils.ClipColorChannel(float64(saturation) * this.level)
+				increasedSaturation := utils.ClipColorChannel(float64(saturation) * this.Level)
 				normalizedIncreasedSaturation := float64(increasedSaturation) / 255.0
 
 				newColor := colorful.Hsv(hue, normalizedIncreasedSaturation, value)

@@ -19,13 +19,9 @@ const emit = defineEmits<{
 const { isLoading } = useImageProcessing();
 const selectedOperationType = ref<ImageOperationType>(props.initialOperationType);
 const selectedLevel = ref<number>(1);
-const selectedTint = ref<Color>({ r: 255, g: 0, b: 255, a: 255 });
+const selectedTint = ref<Color>({ r: 0, g: 0, b: 0, a: 255 });
 
-watch(selectedOperationType, () => {
-  if (!selectedOperationType.value) {
-    return;
-  }
-
+watch([selectedOperationType, selectedLevel, selectedTint], () => {
   emit("change", selectedOperationType.value, selectedLevel.value, selectedTint.value);
 });
 

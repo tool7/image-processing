@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -13,6 +12,7 @@ import (
 	"tool7/image-processing/operations"
 	"tool7/image-processing/utils"
 
+	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -125,23 +125,92 @@ func (a *App) ProcessImage() ProcessedImage {
 	}
 }
 
+func (a *App) ResetAppState() {
+	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
+	a.imageLayerCollection = imageLayerCollection
+}
+
 func (a *App) AppendImageOperation(operation ImageOperation) error {
+	imageLayer, err := CreateImageLayerWithOperation(operation)
+	if err != nil {
+		panic(err)
+	}
+
+	a.imageLayerCollection.Append(imageLayer)
+
+	return nil
+}
+
+func (a *App) RemoveImageOperationAtIndex(index int) error {
+	a.imageLayerCollection.RemoveAt(index)
+
+	return nil
+}
+
+func (a *App) UpdateImageOperationAtIndex(index int, operation ImageOperation) error {
+	imageLayer, err := a.imageLayerCollection.At(index)
+	if err != nil {
+		panic(err)
+	}
+
+	switch operation.Type {
+	case Brightness:
+		brightnessOperation, ok := imageLayer.Operation.(*operations.BrightnessOperation)
+		if !ok {
+			panic("Failed to cast to BrightnessOperation")
+		}
+		brightnessOperation.Level = operation.Level
+		break
+	case Contrast:
+		contrastOperation, ok := imageLayer.Operation.(*operations.ContrastOperation)
+		if !ok {
+			panic("Failed to cast to ContrastOperation")
+		}
+		contrastOperation.Factor = operation.Level
+		break
+	case Saturation:
+		saturationOperation, ok := imageLayer.Operation.(*operations.SaturationOperation)
+		if !ok {
+			panic("Failed to cast to SaturationOperation")
+		}
+		saturationOperation.Level = operation.Level
+		break
+	case Tint:
+		tintOperation, ok := imageLayer.Operation.(*operations.TintOperation)
+		if !ok {
+			panic("Failed to cast to TintOperation")
+		}
+		tintOperation.Intensity = operation.Level
+		tintOperation.Tint = color.RGBA(operation.Tint)
+		break
+	}
+
+	return nil
+}
+
+func (a *App) ReplaceImageOperationAtIndex(index int, operation ImageOperation) error {
+	imageLayer, err := CreateImageLayerWithOperation(operation)
+	if err != nil {
+		panic(err)
+	}
+
+	a.imageLayerCollection.RemoveAt(index)
+	a.imageLayerCollection.InsertAt(imageLayer, index)
+
+	return nil
+}
+
+func CreateImageLayerWithOperation(operation ImageOperation) (*models.ImageLayer, error) {
 	switch operation.Type {
 	case Brightness:
 		brightnessOperation := operations.NewBrightnessOperation(operation.Level)
-		brightnessLayer := utils.NewImageLayer(brightnessOperation)
-		a.imageLayerCollection.Append(brightnessLayer)
-		break
+		return utils.NewImageLayer(brightnessOperation), nil
 	case Contrast:
 		contrastOperation := operations.NewContrastOperation(operation.Level)
-		contrastLayer := utils.NewImageLayer(contrastOperation)
-		a.imageLayerCollection.Append(contrastLayer)
-		break
+		return utils.NewImageLayer(contrastOperation), nil
 	case Saturation:
 		saturationOperation := operations.NewSaturationOperation(operation.Level)
-		saturationLayer := utils.NewImageLayer(saturationOperation)
-		a.imageLayerCollection.Append(saturationLayer)
-		break
+		return utils.NewImageLayer(saturationOperation), nil
 	case Tint:
 		applyTintOperation := operations.NewTintOperation(color.RGBA{
 			R: operation.Tint.R,
@@ -150,24 +219,16 @@ func (a *App) AppendImageOperation(operation ImageOperation) error {
 			A: operation.Tint.A,
 		}, operation.Level)
 
-		tintLayer := utils.NewImageLayer(applyTintOperation)
-		a.imageLayerCollection.Append(tintLayer)
-		break
+		return utils.NewImageLayer(applyTintOperation), nil
 	case Greyscale:
 		greyscaleOperation := operations.NewGreyscaleOperation()
-		greyscaleLayer := utils.NewImageLayer(greyscaleOperation)
-		a.imageLayerCollection.Append(greyscaleLayer)
-		break
+		return utils.NewImageLayer(greyscaleOperation), nil
 	case Negative:
 		negativeOperation := operations.NewNegativeOperation()
-		negativeLayer := utils.NewImageLayer(negativeOperation)
-		a.imageLayerCollection.Append(negativeLayer)
-		break
+		return utils.NewImageLayer(negativeOperation), nil
 	case Sepia:
 		sepiaOperation := operations.NewSepiaOperation()
-		sepiaLayer := utils.NewImageLayer(sepiaOperation)
-		a.imageLayerCollection.Append(sepiaLayer)
-		break
+		return utils.NewImageLayer(sepiaOperation), nil
 	case Emboss:
 		break
 	case EdgesVertical:
@@ -186,14 +247,5 @@ func (a *App) AppendImageOperation(operation ImageOperation) error {
 		break
 	}
 
-	fmt.Println("=================================== AppendImageOperation")
-	fmt.Println(a.imageLayerCollection.Size)
-
-	return nil
-}
-
-func (a *App) RemoveImageOperationAtIndex(index int) error {
-	a.imageLayerCollection.RemoveAt(index)
-
-	return nil
+	return nil, errors.New("Failed to create ImageLayer with provided ImageOperation")
 }

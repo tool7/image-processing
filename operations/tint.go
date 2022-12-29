@@ -10,8 +10,8 @@ import (
 )
 
 type TintOperation struct {
-	tint      color.RGBA
-	intensity float64
+	Tint      color.RGBA
+	Intensity float64
 }
 
 func NewTintOperation(tint color.RGBA, intensity float64) *TintOperation {
@@ -29,10 +29,10 @@ func (this *TintOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) 
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
 				R, G, B, A := utils.GetPixelColor(inputImage, x, y)
 
-				newR := utils.ClipColorChannel(int32(R) + int32(this.tint.R))
-				newG := utils.ClipColorChannel(int32(G) + int32(this.tint.G))
-				newB := utils.ClipColorChannel(int32(B) + int32(this.tint.B))
-				newA := utils.ClipColorChannel(int32(A) + int32(this.tint.A))
+				newR := utils.ClipColorChannel(int32(R) + int32(this.Tint.R))
+				newG := utils.ClipColorChannel(int32(G) + int32(this.Tint.G))
+				newB := utils.ClipColorChannel(int32(B) + int32(this.Tint.B))
+				newA := utils.ClipColorChannel(int32(A) + int32(this.Tint.A))
 
 				hue, normalizedSaturation, value := colorful.Color{
 					R: float64(newR),
@@ -41,7 +41,7 @@ func (this *TintOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) 
 				}.Hsv()
 				saturation := utils.ClipColorChannel(normalizedSaturation * 255)
 
-				increasedSaturation := utils.ClipColorChannel(float64(saturation) * this.intensity)
+				increasedSaturation := utils.ClipColorChannel(float64(saturation) * this.Intensity)
 				normalizedIncreasedSaturation := float64(increasedSaturation) / 255.0
 
 				newColor := colorful.Hsv(hue, normalizedIncreasedSaturation, value)

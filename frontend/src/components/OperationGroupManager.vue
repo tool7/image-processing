@@ -7,7 +7,8 @@ import OperationBuilder from "./OperationBuilder.vue";
 import { useImageProcessing } from "../composables/image-processing";
 import { Color, imageOperationSelectItems, ImageOperationType } from "../types/image";
 
-const { addImageOperation, removeImageOperation, processImage } = useImageProcessing();
+const { addImageOperation, removeImageOperation, updateImageOperation, replaceImageOperation, processImage } =
+  useImageProcessing();
 
 const operations = ref<Array<{ id: number; operation: main.ImageOperation }>>([]);
 
@@ -21,12 +22,8 @@ const dragOptions = {
 // TODO: Use nanoid ?
 let id = 0;
 
-const onAddOperation = async (operationType: ImageOperationType) => {
-  const operation = new main.ImageOperation({
-    type: operationType,
-    level: 1,
-    tint: { r: 255, g: 0, b: 255, a: 255 },
-  });
+const onAddOperation = async (type: ImageOperationType) => {
+  const operation = new main.ImageOperation({ type, level: 1, tint: { r: 0, g: 0, b: 0, a: 255 } });
   operations.value.push({ id, operation });
 
   id++;
@@ -51,7 +48,25 @@ const onRemoveOperation = async (index: number) => {
 };
 
 const onOperationChange = async (index: number, type: ImageOperationType, level?: number, tint?: Color) => {
-  console.log(index, type, level, tint);
+  const changedOperation = operations.value[index].operation;
+
+  try {
+    if (changedOperation.type === type) {
+      changedOperation.level = level;
+      changedOperation.tint = tint;
+
+      await updateImageOperation(index, changedOperation);
+    } else {
+      const newOperation = new main.ImageOperation({ type, level, tint });
+      await replaceImageOperation(index, newOperation);
+
+      operations.value[index].operation.type = type;
+    }
+
+    await processImage();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const onDragEnd = () => {

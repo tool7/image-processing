@@ -8,7 +8,7 @@ import (
 )
 
 type ContrastOperation struct {
-	factor float64
+	Factor float64
 }
 
 func NewContrastOperation(factor float64) *ContrastOperation {
@@ -25,9 +25,9 @@ func (this *ContrastOperation) Execute(inputImage *image.RGBA) (*image.RGBA, err
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
 				R, G, B, A := utils.GetPixelColor(inputImage, x, y)
 
-				newR := this.factor*(float64(R)-128) + 128
-				newG := this.factor*(float64(G)-128) + 128
-				newB := this.factor*(float64(B)-128) + 128
+				newR := this.Factor*(float64(R)-128) + 128
+				newG := this.Factor*(float64(G)-128) + 128
+				newB := this.Factor*(float64(B)-128) + 128
 
 				clippedR := utils.ClipColorChannel(newR)
 				clippedG := utils.ClipColorChannel(newG)

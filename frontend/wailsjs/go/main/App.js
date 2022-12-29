@@ -17,3 +17,15 @@ export function ProcessImage() {
 export function RemoveImageOperationAtIndex(arg1) {
   return window['go']['main']['App']['RemoveImageOperationAtIndex'](arg1);
 }
+
+export function ReplaceImageOperationAtIndex(arg1, arg2) {
+  return window['go']['main']['App']['ReplaceImageOperationAtIndex'](arg1, arg2);
+}
+
+export function ResetAppState() {
+  return window['go']['main']['App']['ResetAppState']();
+}
+
+export function UpdateImageOperationAtIndex(arg1, arg2) {
+  return window['go']['main']['App']['UpdateImageOperationAtIndex'](arg1, arg2);
+}
