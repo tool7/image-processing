@@ -1,25 +1,37 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
+
 import { useImageProcessing } from "../composables/image-processing";
-import { Color, ImageOperation, ImageOperationType, imageOperationSelectItems } from "../types/image";
+import { Color, ImageOperationType, imageOperationSelectItems } from "../types/image";
+
+const props = defineProps({
+  initialOperationType: {
+    type: Number,
+    required: true,
+  },
+});
 
 const emit = defineEmits<{
-  (e: "change", operation: ImageOperation): void;
+  (e: "change", type: ImageOperationType, level?: number, tint?: Color): void;
+  (e: "remove"): void;
 }>();
 
 const { isLoading } = useImageProcessing();
-const selectedOperationType = ref<ImageOperationType | undefined>();
+const selectedOperationType = ref<ImageOperationType>(props.initialOperationType);
 const selectedLevel = ref<number>(1);
-const selectedTint = ref<Color>({ r: 255, g: 0, b: 255, a: 1 });
+const selectedTint = ref<Color>({ r: 255, g: 0, b: 255, a: 255 });
 
 watch(selectedOperationType, () => {
   if (!selectedOperationType.value) {
     return;
   }
 
-  const imageOperation = new ImageOperation(selectedOperationType.value, selectedLevel.value, selectedTint.value);
-  emit("change", imageOperation);
+  emit("change", selectedOperationType.value, selectedLevel.value, selectedTint.value);
 });
+
+const onRemove = () => {
+  emit("remove");
+};
 </script>
 
 <template>
@@ -63,12 +75,16 @@ watch(selectedOperationType, () => {
     </v-card-item>
 
     <div class="d-flex justify-end">
-      <v-btn variant="tonal" size="x-small" icon="fas fa-trash-can" :rounded="0" class="remove-btn" />
+      <v-btn variant="tonal" size="x-small" icon="fas fa-trash-can" :rounded="0" class="remove-btn" @click="onRemove" />
     </div>
   </v-card>
 </template>
 
 <style scoped>
+.v-card--disabled {
+  color: var(--color-dark-grey);
+}
+
 .reorder-handle {
   cursor: grab;
   border-bottom-left-radius: 6px !important;

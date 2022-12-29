@@ -1,6 +1,6 @@
 import { ref, readonly } from "vue";
 import { main } from "../../wailsjs/go/models";
-import { OpenImageFileSelector, ProccessImage } from "../../wailsjs/go/main/App";
+import { OpenImageFileSelector, ProcessImage, AppendImageOperation } from "../../wailsjs/go/main/App";
 
 const isLoading = ref<boolean>(false);
 const processedImage = ref<main.ProcessedImage | undefined>();
@@ -23,7 +23,24 @@ const openImageFileSelector = async () => {
       return;
     }
 
-    const result = await ProccessImage();
+    const result = await ProcessImage();
+    setProcessedImage(result);
+  } catch (err) {
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const addImageOperation = async (operation: main.ImageOperation) => {
+  await AppendImageOperation(operation);
+};
+
+const processImage = async () => {
+  setIsLoading(true);
+
+  try {
+    const result = await ProcessImage();
     setProcessedImage(result);
   } catch (err) {
     throw err;
@@ -37,24 +54,12 @@ const resetAppState = () => {
   setProcessedImage(undefined);
 };
 
-const processImage = async () => {
-  setIsLoading(true);
-
-  try {
-    const result = await ProccessImage();
-    setProcessedImage(result);
-  } catch (err) {
-    throw err;
-  } finally {
-    setIsLoading(false);
-  }
-};
-
 export function useImageProcessing() {
   return {
     isLoading: readonly(isLoading),
     processedImage: readonly(processedImage),
     openImageFileSelector,
+    addImageOperation,
     processImage,
     resetAppState,
   };

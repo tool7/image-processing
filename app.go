@@ -6,16 +6,20 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
+	"image/color"
 	"image/png"
 
+	"tool7/image-processing/models"
+	"tool7/image-processing/operations"
 	"tool7/image-processing/utils"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
-	ctx           context.Context
-	originalImage *image.RGBA
+	ctx                  context.Context
+	originalImage        *image.RGBA
+	imageLayerCollection *models.ImageLayerCollection
 }
 
 type ProcessedImage struct {
@@ -27,7 +31,7 @@ type ProcessedImage struct {
 type ImageOperationType int
 
 const (
-	Brightness ImageOperationType = iota
+	Brightness ImageOperationType = iota + 1
 	Contrast
 	Saturation
 	Tint
@@ -44,28 +48,17 @@ const (
 	RotateBy270
 )
 
-func (o ImageOperationType) String() string {
-	return [...]string{
-		"brightness",
-		"contrast",
-		"saturation",
-		"tint",
-		"greyscale",
-		"negative",
-		"sepia",
-		"emboss",
-		"edges-vertical",
-		"edges-horizontal",
-		"mirror-vertical",
-		"mirror-horizontal",
-		"rotate-90",
-		"rotate-180",
-		"rotate-270",
-	}[o]
+type ImageColor struct {
+	R uint8 `json:"r"`
+	G uint8 `json:"g"`
+	B uint8 `json:"b"`
+	A uint8 `json:"a"`
 }
 
 type ImageOperation struct {
-	Type ImageOperationType `json:"type"`
+	Type  ImageOperationType `json:"type"`
+	Level float64            `json:"level,omitempty"`
+	Tint  ImageColor         `json:"tint,omitempty"`
 }
 
 func NewApp() *App {
@@ -101,12 +94,25 @@ func (a *App) OpenImageFileSelector() bool {
 	}
 
 	a.originalImage = img
+
+	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
+	a.imageLayerCollection = imageLayerCollection
+
 	return true
 }
 
-func (a *App) ProccessImage() ProcessedImage {
+func (a *App) ProcessImage() ProcessedImage {
 	var buff bytes.Buffer
-	png.Encode(&buff, a.originalImage)
+
+	if a.imageLayerCollection.Size > 0 {
+		processedImage, err := a.imageLayerCollection.ExecuteLayersFrom(0)
+		if err != nil {
+			panic(err)
+		}
+		png.Encode(&buff, processedImage)
+	} else {
+		png.Encode(&buff, a.originalImage)
+	}
 
 	rawBase64String := base64.StdEncoding.EncodeToString(buff.Bytes())
 	base64String := "data:image/png;base64,"
@@ -119,8 +125,69 @@ func (a *App) ProccessImage() ProcessedImage {
 	}
 }
 
-func (a *App) AddImageOperation(operation ImageOperation) bool {
-	fmt.Println(operation.Type.String())
+func (a *App) AppendImageOperation(operation ImageOperation) bool {
+	switch operation.Type {
+	case Brightness:
+		brightnessOperation := operations.NewBrightnessOperation(operation.Level)
+		brightnessLayer := utils.NewImageLayer(brightnessOperation)
+		a.imageLayerCollection.Append(brightnessLayer)
+		break
+	case Contrast:
+		contrastOperation := operations.NewContrastOperation(operation.Level)
+		contrastLayer := utils.NewImageLayer(contrastOperation)
+		a.imageLayerCollection.Append(contrastLayer)
+		break
+	case Saturation:
+		saturationOperation := operations.NewSaturationOperation(operation.Level)
+		saturationLayer := utils.NewImageLayer(saturationOperation)
+		a.imageLayerCollection.Append(saturationLayer)
+		break
+	case Tint:
+		applyTintOperation := operations.NewTintOperation(color.RGBA{
+			R: operation.Tint.R,
+			G: operation.Tint.G,
+			B: operation.Tint.B,
+			A: operation.Tint.A,
+		}, operation.Level)
+
+		tintLayer := utils.NewImageLayer(applyTintOperation)
+		a.imageLayerCollection.Append(tintLayer)
+		break
+	case Greyscale:
+		greyscaleOperation := operations.NewGreyscaleOperation()
+		greyscaleLayer := utils.NewImageLayer(greyscaleOperation)
+		a.imageLayerCollection.Append(greyscaleLayer)
+		break
+	case Negative:
+		negativeOperation := operations.NewNegativeOperation()
+		negativeLayer := utils.NewImageLayer(negativeOperation)
+		a.imageLayerCollection.Append(negativeLayer)
+		break
+	case Sepia:
+		sepiaOperation := operations.NewSepiaOperation()
+		sepiaLayer := utils.NewImageLayer(sepiaOperation)
+		a.imageLayerCollection.Append(sepiaLayer)
+		break
+	case Emboss:
+		break
+	case EdgesVertical:
+		break
+	case EdgesHorizontal:
+		break
+	case MirrorVertical:
+		break
+	case MirrorHorizontal:
+		break
+	case RotateBy90:
+		break
+	case RotateBy180:
+		break
+	case RotateBy270:
+		break
+	}
+
+	fmt.Println("=================================== AppendImageOperation")
+	fmt.Println(a.imageLayerCollection.Size)
 
 	return true
 }

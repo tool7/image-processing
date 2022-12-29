@@ -36,7 +36,7 @@ const onSelectImage = async () => {
       Select image to begin
     </v-btn>
 
-    <main v-if="processedImage && !isLoading" class="h-100 w-100 d-flex flex-column">
+    <main v-if="processedImage" class="h-100 w-100 d-flex flex-column">
       <div id="image-viewer">
         <ImageViewer :width="processedImage.width" :height="processedImage.height" :base64="processedImage.base64" />
       </div>

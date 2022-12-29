@@ -6,41 +6,21 @@ export interface Color {
 }
 
 export enum ImageOperationType {
-  Brightness = "brightness",
-  Contrast = "contrast",
-  Saturation = "saturation",
-  Tint = "tint",
-  Greyscale = "greyscale",
-  Negative = "negative",
-  Sepia = "sepia",
-  Emboss = "emboss",
-  EdgesVertical = "edges-vertical",
-  EdgesHorizontal = "edges-horizontal",
-  MirrorVertical = "mirror-vertical",
-  MirrorHorizontal = "mirror-horizontal",
-  RotateBy90 = "rotate-90",
-  RotateBy180 = "rotate-180",
-  RotateBy270 = "rotate-270",
-}
-
-export class ImageOperation {
-  public level?: number;
-  public tint?: any;
-
-  constructor(public type: ImageOperationType, level?: number, tint?: any) {
-    switch (type) {
-      case ImageOperationType.Brightness:
-      case ImageOperationType.Contrast:
-      case ImageOperationType.Saturation:
-        this.level = level;
-        break;
-      case ImageOperationType.Tint:
-        this.level = level;
-        this.tint = tint;
-      default:
-        break;
-    }
-  }
+  Brightness = 1,
+  Contrast,
+  Saturation,
+  Tint,
+  Greyscale,
+  Negative,
+  Sepia,
+  Emboss,
+  EdgesVertical,
+  EdgesHorizontal,
+  MirrorVertical,
+  MirrorHorizontal,
+  RotateBy90,
+  RotateBy180,
+  RotateBy270,
 }
 
 export const imageOperationSelectItems: Array<{ type: ImageOperationType; label: string }> = [
