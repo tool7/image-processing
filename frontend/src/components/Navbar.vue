@@ -3,13 +3,7 @@ import { computed } from "vue";
 import { WindowMinimise, WindowToggleMaximise, Quit } from "../../wailsjs/runtime/runtime";
 import { useFileManager } from "../composables/file-manager";
 import { useImageProcessing } from "../composables/image-processing";
-
-interface MenuItem {
-  title: string;
-  icon: string;
-  isEnabled: boolean;
-  onClick: () => void;
-}
+import { NavbarMenuItem } from "../types/navbar";
 
 const { processedImage, resetAppState, isLoading } = useImageProcessing();
 const { loadProject, saveProject, exportPng } = useFileManager();
@@ -18,7 +12,7 @@ const onMinimise = () => WindowMinimise();
 const onToggleMaximise = () => WindowToggleMaximise();
 const onQuit = () => Quit();
 
-const menuItems = computed<Array<MenuItem>>(() => {
+const menuItems = computed<Array<NavbarMenuItem>>(() => {
   return [
     {
       title: "Load Project",
@@ -52,7 +46,14 @@ const menuItems = computed<Array<MenuItem>>(() => {
   <div id="navbar" style="--wails-draggable: drag">
     <v-menu>
       <template v-slot:activator="{ props }">
-        <v-btn icon="fas fa-ellipsis-vertical" v-bind="props" size="x-small" variant="tonal" :rounded="0"></v-btn>
+        <v-btn
+          icon="fas fa-ellipsis-vertical"
+          v-bind="props"
+          size="x-small"
+          variant="text"
+          :rounded="0"
+          style="--wails-draggable: none"
+        ></v-btn>
       </template>
 
       <v-list>
@@ -118,11 +119,11 @@ const menuItems = computed<Array<MenuItem>>(() => {
   border-bottom: 1px solid rgba(40, 40, 40, 1);
   font-size: 12px;
   margin: auto;
+  background-color: var(--app-bg-color);
 }
 
 .menu-item:hover {
   cursor: pointer;
-  background-color: var(--color-light-grey);
 }
 
 #btn-quit:hover {

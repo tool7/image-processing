@@ -12,6 +12,9 @@ import { aliases, fa } from "vuetify/iconsets/fa";
 const vuetify = createVuetify({
   components,
   directives,
+  theme: {
+    defaultTheme: "dark"
+  },
   icons: {
     defaultSet: "fa",
     aliases,
