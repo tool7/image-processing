@@ -1,13 +1,12 @@
 export namespace main {
 	
-	export class ImageColor {
+	export class TintRGB {
 	    r: number;
 	    g: number;
 	    b: number;
-	    a: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new ImageColor(source);
+	        return new TintRGB(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -15,13 +14,12 @@ export namespace main {
 	        this.r = source["r"];
 	        this.g = source["g"];
 	        this.b = source["b"];
-	        this.a = source["a"];
 	    }
 	}
 	export class ImageOperation {
 	    type: number;
 	    level?: number;
-	    tint?: ImageColor;
+	    tint?: TintRGB;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageOperation(source);
@@ -31,7 +29,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.type = source["type"];
 	        this.level = source["level"];
-	        this.tint = this.convertValues(source["tint"], ImageColor);
+	        this.tint = this.convertValues(source["tint"], TintRGB);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

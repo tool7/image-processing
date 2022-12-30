@@ -1,10 +1,3 @@
-export interface Color {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
-
 export enum ImageOperationType {
   Brightness = 1,
   Contrast,
@@ -85,3 +78,12 @@ export const imageOperationSelectItems: Array<{ type: ImageOperationType; label:
     label: "Rotate by -90°",
   },
 ];
+
+const colorComponentToHex = (c: number) => {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+};
+
+export const rgbToHex = (r: number, g: number, b: number, a: number) => {
+  return "#" + colorComponentToHex(r) + colorComponentToHex(g) + colorComponentToHex(b) + colorComponentToHex(a);
+};

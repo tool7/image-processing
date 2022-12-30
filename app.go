@@ -48,17 +48,16 @@ const (
 	RotateBy270
 )
 
-type ImageColor struct {
+type TintRGB struct {
 	R uint8 `json:"r"`
 	G uint8 `json:"g"`
 	B uint8 `json:"b"`
-	A uint8 `json:"a"`
 }
 
 type ImageOperation struct {
 	Type  ImageOperationType `json:"type"`
 	Level float64            `json:"level,omitempty"`
-	Tint  ImageColor         `json:"tint,omitempty"`
+	Tint  TintRGB            `json:"tint,omitempty"`
 }
 
 func NewApp() *App {
@@ -181,7 +180,12 @@ func (a *App) UpdateImageOperationAtIndex(index int, operation ImageOperation) e
 			panic("Failed to cast to TintOperation")
 		}
 		tintOperation.Intensity = operation.Level
-		tintOperation.Tint = color.RGBA(operation.Tint)
+		tintOperation.Tint = color.RGBA{
+			R: operation.Tint.R,
+			G: operation.Tint.G,
+			B: operation.Tint.B,
+			A: 255,
+		}
 		break
 	}
 
@@ -216,7 +220,7 @@ func CreateImageLayerWithOperation(operation ImageOperation) (*models.ImageLayer
 			R: operation.Tint.R,
 			G: operation.Tint.G,
 			B: operation.Tint.B,
-			A: operation.Tint.A,
+			A: 255,
 		}, operation.Level)
 
 		return utils.NewImageLayer(applyTintOperation), nil

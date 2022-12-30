@@ -5,7 +5,7 @@ import draggable from "vuedraggable";
 import { main } from "../../wailsjs/go/models";
 import OperationBuilder from "./OperationBuilder.vue";
 import { useImageProcessing } from "../composables/image-processing";
-import { Color, imageOperationSelectItems, ImageOperationType } from "../types/image";
+import { imageOperationSelectItems, ImageOperationType } from "../types/image";
 
 const { addImageOperation, removeImageOperation, updateImageOperation, replaceImageOperation, processImage } =
   useImageProcessing();
@@ -23,7 +23,7 @@ const dragOptions = {
 let id = 0;
 
 const onAddOperation = async (type: ImageOperationType) => {
-  const operation = new main.ImageOperation({ type, level: 1, tint: { r: 0, g: 0, b: 0, a: 255 } });
+  const operation = new main.ImageOperation({ type, level: 1, tint: { r: 0, g: 0, b: 0 } });
   operations.value.push({ id, operation });
 
   id++;
@@ -47,7 +47,7 @@ const onRemoveOperation = async (index: number) => {
   }
 };
 
-const onOperationChange = async (index: number, type: ImageOperationType, level?: number, tint?: Color) => {
+const onOperationChange = async (index: number, type: ImageOperationType, level?: number, tint?: main.TintRGB) => {
   const changedOperation = operations.value[index].operation;
 
   try {
@@ -78,7 +78,7 @@ const onDragEnd = () => {
   <v-menu transition="slide-y-transition">
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" variant="tonal" size="small" prepend-icon="fas fa-plus" :rounded="0" class="mb-5">
-        Add New Operation
+        New Operation
       </v-btn>
     </template>
     <v-list>

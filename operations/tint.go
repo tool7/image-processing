@@ -32,7 +32,6 @@ func (this *TintOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) 
 				newR := utils.ClipColorChannel(int32(R) + int32(this.Tint.R))
 				newG := utils.ClipColorChannel(int32(G) + int32(this.Tint.G))
 				newB := utils.ClipColorChannel(int32(B) + int32(this.Tint.B))
-				newA := utils.ClipColorChannel(int32(A) + int32(this.Tint.A))
 
 				hue, normalizedSaturation, value := colorful.Color{
 					R: float64(newR),
@@ -49,7 +48,7 @@ func (this *TintOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) 
 					uint8(newColor.R),
 					uint8(newColor.G),
 					uint8(newColor.B),
-					newA,
+					A,
 				})
 			}
 		}
