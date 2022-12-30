@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import "@fortawesome/fontawesome-free/css/all.css";
+import "@vueform/slider/themes/default.css";
 
 // Vuetify
 import "vuetify/styles";
@@ -13,7 +14,7 @@ const vuetify = createVuetify({
   components,
   directives,
   theme: {
-    defaultTheme: "dark"
+    defaultTheme: "dark",
   },
   icons: {
     defaultSet: "fa",

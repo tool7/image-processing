@@ -18,6 +18,14 @@ body {
   --color-white: #f0f0f0;
   --color-light-grey: #cfcfcf;
   --color-dark-grey: #7b7b7b;
+
+  --slider-height: 4px;
+  --slider-bg: var(--color-dark-grey);
+  --slider-connect-bg: #90caf9;
+  --slider-tooltip-bg: #4a99d9;
+  --slider-handle-width: 10px;
+  --slider-handle-height: 16px;
+  --slider-handle-radius: 2px;
 }
 
 @font-face {

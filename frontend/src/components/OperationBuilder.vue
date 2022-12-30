@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
+import Slider from "@vueform/slider";
 
 import { useImageProcessing } from "../composables/image-processing";
 import { Color, ImageOperationType, imageOperationSelectItems } from "../types/image";
@@ -21,13 +22,19 @@ const selectedOperationType = ref<ImageOperationType>(props.initialOperationType
 const selectedLevel = ref<number>(1);
 const selectedTint = ref<Color>({ r: 0, g: 0, b: 0, a: 255 });
 
-watch([selectedOperationType, selectedLevel, selectedTint], () => {
+const onRemove = () => emit("remove");
+
+watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValues) => {
+  const oldOperationType = oldValues[0];
+  const newOperationType = newValues[0];
+
+  if (oldOperationType !== newOperationType) {
+    selectedLevel.value = 1;
+    selectedTint.value = { r: 0, g: 0, b: 0, a: 255 };
+  }
+
   emit("change", selectedOperationType.value, selectedLevel.value, selectedTint.value);
 });
-
-const onRemove = () => {
-  emit("remove");
-};
 </script>
 
 <template>
@@ -48,24 +55,56 @@ const onRemove = () => {
         variant="solo"
       />
 
-      <div v-if="selectedOperationType === ImageOperationType.Brightness">
+      <div v-if="selectedOperationType === ImageOperationType.Brightness" class="controls">
         <div class="text-caption">Level</div>
-        <v-slider v-model="selectedLevel" :min="0" :max="2" :step="0.2" color="grey" thumb-label thumb-color="white" />
+        <Slider
+          v-model="selectedLevel"
+          v-bind="null"
+          :min="0"
+          :max="2"
+          :step="0.2"
+          :format="(v: number) => v"
+          show-tooltip="drag"
+        />
       </div>
 
-      <div v-if="selectedOperationType === ImageOperationType.Contrast">
+      <div v-if="selectedOperationType === ImageOperationType.Contrast" class="controls">
         <div class="text-caption">Factor</div>
-        <v-slider v-model="selectedLevel" :min="0" :max="9" :step="0.5" color="grey" thumb-label thumb-color="white" />
+        <Slider
+          v-model="selectedLevel"
+          v-bind="null"
+          :min="0"
+          :max="4"
+          :step="0.1"
+          :format="(v: number) => v"
+          show-tooltip="drag"
+        />
       </div>
 
-      <div v-if="selectedOperationType === ImageOperationType.Saturation">
+      <div v-if="selectedOperationType === ImageOperationType.Saturation" class="controls">
         <div class="text-caption">Level</div>
-        <v-slider v-model="selectedLevel" :min="0" :max="3" :step="0.2" color="grey" thumb-label thumb-color="white" />
+        <Slider
+          v-model="selectedLevel"
+          v-bind="null"
+          :min="0"
+          :max="3"
+          :step="0.1"
+          :format="(v: number) => v"
+          show-tooltip="drag"
+        />
       </div>
 
-      <div v-if="selectedOperationType === ImageOperationType.Tint">
+      <div v-if="selectedOperationType === ImageOperationType.Tint" class="controls">
         <div class="text-caption">Intensity</div>
-        <v-slider v-model="selectedLevel" :min="0" :max="3" :step="0.2" color="grey" thumb-label thumb-color="white" />
+        <Slider
+          v-model="selectedLevel"
+          v-bind="null"
+          :min="0"
+          :max="3"
+          :step="0.1"
+          :format="(v: number) => v"
+          show-tooltip="drag"
+        />
         <v-btn prepend-icon="fas fa-palette" variant="outlined" size="small" class="mb-2">{{ selectedTint }}</v-btn>
       </div>
     </v-card-item>
@@ -84,6 +123,10 @@ const onRemove = () => {
 .reorder-handle {
   cursor: grab;
   border-bottom-left-radius: 6px !important;
+}
+
+.controls > .slider-horizontal {
+  margin: 8px 12px;
 }
 
 .remove-btn {
