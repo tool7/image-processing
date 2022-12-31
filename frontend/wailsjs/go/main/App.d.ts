@@ -16,4 +16,6 @@ export function ReplaceImageOperationAtIndex(arg1:number,arg2:main.ImageOperatio
 
 export function ResetAppState():Promise<void>;
 
+export function ToggleImageOperation(arg1:number,arg2:boolean):Promise<Error>;
+
 export function UpdateImageOperationAtIndex(arg1:number,arg2:main.ImageOperation):Promise<Error>;

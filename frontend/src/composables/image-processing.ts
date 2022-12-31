@@ -10,6 +10,7 @@ import {
   UpdateImageOperationAtIndex,
   ReplaceImageOperationAtIndex,
   MoveImageOperation,
+  ToggleImageOperation,
 } from "../../wailsjs/go/main/App";
 
 const isLoading = ref<boolean>(false);
@@ -65,6 +66,10 @@ const moveImageOperation = async (oldIndex: number, newIndex: number) => {
   await MoveImageOperation(oldIndex, newIndex);
 };
 
+const toggleImageOperation = async (index: number, enable: boolean) => {
+  await ToggleImageOperation(index, enable);
+};
+
 const processImage = async () => {
   setIsLoading(true);
 
@@ -95,6 +100,7 @@ export function useImageProcessing() {
     updateImageOperation,
     replaceImageOperation,
     moveImageOperation,
+    toggleImageOperation,
     processImage,
     resetAppState,
   };

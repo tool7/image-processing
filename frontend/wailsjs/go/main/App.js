@@ -30,6 +30,10 @@ export function ResetAppState() {
   return window['go']['main']['App']['ResetAppState']();
 }
 
+export function ToggleImageOperation(arg1, arg2) {
+  return window['go']['main']['App']['ToggleImageOperation'](arg1, arg2);
+}
+
 export function UpdateImageOperationAtIndex(arg1, arg2) {
   return window['go']['main']['App']['UpdateImageOperationAtIndex'](arg1, arg2);
 }

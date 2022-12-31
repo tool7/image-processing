@@ -13,11 +13,12 @@ const {
   updateImageOperation,
   replaceImageOperation,
   moveImageOperation,
+  toggleImageOperation,
   processImage,
   isLoading,
 } = useImageProcessing();
 
-const operations = ref<Array<{ id: number; operation: main.ImageOperation }>>([]);
+const operations = ref<Array<{ id: number; operation: main.ImageOperation; isEnabled: boolean }>>([]);
 
 const dragOptions = {
   animation: 200,
@@ -31,7 +32,7 @@ let id = 0;
 
 const onAddOperation = async (type: ImageOperationType) => {
   const operation = new main.ImageOperation({ type, level: 1, tint: { r: 0, g: 0, b: 255 } });
-  operations.value.push({ id, operation });
+  operations.value.push({ id, operation, isEnabled: true });
 
   id++;
 
@@ -47,6 +48,17 @@ const onRemoveOperation = async (index: number) => {
   try {
     await removeImageOperation(index);
     operations.value.splice(index, 1);
+
+    await processImage();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const onToggleOperation = async (index: number, isEnabled: boolean) => {
+  try {
+    await toggleImageOperation(index, !isEnabled);
+    operations.value[index].isEnabled = !isEnabled;
 
     await processImage();
   } catch (err) {
@@ -119,9 +131,11 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
     <template #item="{ element, index }">
       <OperationBuilder
         :initial-operation-type="element.operation.type"
+        :is-enabled="element.isEnabled"
         class="mr-4"
         @change="(type, level, tint) => onOperationChange(index, type, level, tint)"
         @remove="() => onRemoveOperation(index)"
+        @toggle="() => onToggleOperation(index, element.isEnabled)"
       />
     </template>
   </draggable>

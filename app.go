@@ -218,6 +218,21 @@ func (a *App) MoveImageOperation(oldIndex, newIndex int) error {
 	return nil
 }
 
+func (a *App) ToggleImageOperation(index int, enable bool) error {
+	imageLayer, err := a.imageLayerCollection.At(index)
+	if err != nil {
+		panic(err)
+	}
+
+	if enable {
+		imageLayer.Enable()
+	} else {
+		imageLayer.Disable()
+	}
+
+	return nil
+}
+
 func CreateImageLayerWithOperation(operation ImageOperation) (*models.ImageLayer, error) {
 	switch operation.Type {
 	case Brightness:

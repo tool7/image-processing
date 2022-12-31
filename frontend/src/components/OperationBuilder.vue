@@ -11,11 +11,16 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  isEnabled: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const emit = defineEmits<{
   (e: "change", type: ImageOperationType, level?: number, tint?: main.TintRGB): void;
   (e: "remove"): void;
+  (e: "toggle"): void;
 }>();
 
 const { isLoading } = useImageProcessing();
@@ -26,6 +31,7 @@ const selectedColorPickerValue = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
 const isColorPickerOpen = ref<boolean>(false);
 
 const onRemove = () => emit("remove");
+const onToggle = () => emit("toggle");
 
 const onColorSelect = () => {
   selectedTint.value = selectedColorPickerValue.value;
@@ -48,7 +54,24 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
 <template>
   <v-card :disabled="isLoading" height="100%" width="240" max-width="240" variant="tonal" :rounded="1">
     <div class="d-flex justify-space-between">
-      <v-btn variant="tonal" size="x-small" icon="fas fa-trash-can" :rounded="0" class="remove-btn" @click="onRemove" />
+      <div>
+        <v-btn
+          variant="tonal"
+          size="x-small"
+          icon="fas fa-trash-can"
+          :rounded="0"
+          class="remove-btn"
+          @click="onRemove"
+        />
+        <v-btn
+          variant="tonal"
+          size="x-small"
+          :icon="isEnabled ? 'fas fa-eye' : 'fas fa-eye-slash'"
+          :rounded="0"
+          class="toggle-btn"
+          @click="onToggle"
+        />
+      </div>
       <v-btn variant="plain" size="small" icon="fas fa-grip-lines" :rounded="0" class="reorder-handle" />
     </div>
 
@@ -159,20 +182,20 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
   border-bottom-left-radius: 6px !important;
 }
 
+.remove-btn:hover {
+  background-color: red;
+}
+
+.toggle-btn {
+  border-bottom-right-radius: 6px !important;
+}
+
 .controls > .slider-horizontal {
   margin: 8px 12px;
 }
 
 #tint-picker-btn {
   margin-top: 20px;
-}
-
-.remove-btn {
-  border-bottom-right-radius: 6px !important;
-}
-
-.remove-btn:hover {
-  background-color: red;
 }
 
 .v-color-picker :deep(.v-color-picker-preview) {
