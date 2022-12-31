@@ -21,8 +21,8 @@ const emit = defineEmits<{
 const { isLoading } = useImageProcessing();
 const selectedOperationType = ref<ImageOperationType>(props.initialOperationType);
 const selectedLevel = ref<number>(1);
-const selectedTint = ref<main.TintRGB>({ r: 0, g: 0, b: 0 });
-const selectedColorPickerValue = ref<main.TintRGB>({ r: 0, g: 0, b: 0 });
+const selectedTint = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
+const selectedColorPickerValue = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
 const isColorPickerOpen = ref<boolean>(false);
 
 const onRemove = () => emit("remove");
@@ -38,7 +38,7 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
 
   if (oldOperationType !== newOperationType) {
     selectedLevel.value = 1;
-    selectedTint.value = { r: 0, g: 0, b: 0 };
+    selectedTint.value = { r: 0, g: 0, b: 255 };
   }
 
   emit("change", selectedOperationType.value, selectedLevel.value, selectedTint.value);
@@ -109,8 +109,8 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
           v-model="selectedLevel"
           v-bind="null"
           :min="0"
-          :max="3"
-          :step="0.1"
+          :max="1"
+          :step="0.01"
           :format="(v: number) => v"
           show-tooltip="drag"
         />
@@ -131,10 +131,16 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
           </template>
           <v-card>
             <v-card-text>
-              <v-color-picker v-model="selectedColorPickerValue" elevation="0" :modes="['rgb']"></v-color-picker>
+              <v-color-picker
+                v-model="selectedColorPickerValue"
+                elevation="0"
+                :modes="['rgb']"
+                hide-canvas
+                hide-inputs
+              />
             </v-card-text>
             <v-card-actions class="d-flex justify-center">
-              <v-btn variant="tonal" class="mb-2 px-4" @click="onColorSelect">Confirm</v-btn>
+              <v-btn variant="tonal" class="mb-3 px-4" @click="onColorSelect">Confirm</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -167,5 +173,9 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
 
 .remove-btn:hover {
   background-color: red;
+}
+
+.v-color-picker :deep(.v-color-picker-preview) {
+  margin-bottom: 0px !important;
 }
 </style>

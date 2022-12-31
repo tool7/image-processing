@@ -7,8 +7,14 @@ import OperationBuilder from "./OperationBuilder.vue";
 import { useImageProcessing } from "../composables/image-processing";
 import { imageOperationSelectItems, ImageOperationType } from "../types/image";
 
-const { addImageOperation, removeImageOperation, updateImageOperation, replaceImageOperation, processImage } =
-  useImageProcessing();
+const {
+  addImageOperation,
+  removeImageOperation,
+  updateImageOperation,
+  replaceImageOperation,
+  processImage,
+  isLoading,
+} = useImageProcessing();
 
 const operations = ref<Array<{ id: number; operation: main.ImageOperation }>>([]);
 
@@ -23,7 +29,7 @@ const dragOptions = {
 let id = 0;
 
 const onAddOperation = async (type: ImageOperationType) => {
-  const operation = new main.ImageOperation({ type, level: 1, tint: { r: 0, g: 0, b: 0 } });
+  const operation = new main.ImageOperation({ type, level: 1, tint: { r: 0, g: 0, b: 255 } });
   operations.value.push({ id, operation });
 
   id++;
@@ -77,7 +83,15 @@ const onDragEnd = () => {
 <template>
   <v-menu transition="slide-y-transition">
     <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" variant="tonal" size="small" prepend-icon="fas fa-plus" :rounded="0" class="mb-5">
+      <v-btn
+        v-bind="props"
+        variant="tonal"
+        size="small"
+        prepend-icon="fas fa-plus"
+        :rounded="0"
+        :disabled="isLoading"
+        class="mb-5"
+      >
         New Operation
       </v-btn>
     </template>

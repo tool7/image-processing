@@ -4,8 +4,6 @@ import (
 	"image"
 	"image/color"
 
-	colorful "github.com/lucasb-eyer/go-colorful"
-
 	utils "tool7/image-processing/utils"
 )
 
@@ -29,27 +27,15 @@ func (this *TintOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) 
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
 				R, G, B, A := utils.GetPixelColor(inputImage, x, y)
 
-				newR := utils.ClipColorChannel(int32(R) + int32(this.Tint.R))
-				newG := utils.ClipColorChannel(int32(G) + int32(this.Tint.G))
-				newB := utils.ClipColorChannel(int32(B) + int32(this.Tint.B))
+				tintR := float64(this.Tint.R) * this.Intensity
+				tintG := float64(this.Tint.G) * this.Intensity
+				tintB := float64(this.Tint.B) * this.Intensity
 
-				hue, normalizedSaturation, value := colorful.Color{
-					R: float64(newR),
-					G: float64(newG),
-					B: float64(newB),
-				}.Hsv()
-				saturation := utils.ClipColorChannel(normalizedSaturation * 255)
+				newR := utils.ClipColorChannel(int32(R) + int32(tintR))
+				newG := utils.ClipColorChannel(int32(G) + int32(tintG))
+				newB := utils.ClipColorChannel(int32(B) + int32(tintB))
 
-				increasedSaturation := utils.ClipColorChannel(float64(saturation) * this.Intensity)
-				normalizedIncreasedSaturation := float64(increasedSaturation) / 255.0
-
-				newColor := colorful.Hsv(hue, normalizedIncreasedSaturation, value)
-				chunkResult.SetRGBA(x, y, color.RGBA{
-					uint8(newColor.R),
-					uint8(newColor.G),
-					uint8(newColor.B),
-					A,
-				})
+				chunkResult.SetRGBA(x, y, color.RGBA{newR, newG, newB, A})
 			}
 		}
 		return chunkResult
