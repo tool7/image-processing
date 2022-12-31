@@ -31,16 +31,18 @@ func NewImageLayerCollection(img *image.RGBA) *models.ImageLayerCollection {
 	}
 }
 
-func GetKernelByType(kernelType models.KernelType) ([][]float32, error) {
+func GetKernelByType(kernelType models.KernelType) [][]float32 {
+	var kernel [][]float32
+
 	switch kernelType {
 	case models.Blur:
-		return [][]float32{
+		kernel = [][]float32{
 			{1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0},
 			{2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0},
 			{1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0},
-		}, nil
+		}
 	case models.MotionBlur:
-		return [][]float32{
+		kernel = [][]float32{
 			{1.0 / 9.0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 1.0 / 9.0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 1.0 / 9.0, 0, 0, 0, 0, 0, 0},
@@ -50,36 +52,36 @@ func GetKernelByType(kernelType models.KernelType) ([][]float32, error) {
 			{0, 0, 0, 0, 0, 0, 1.0 / 9.0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 1.0 / 9.0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 1.0 / 9.0},
-		}, nil
+		}
 	case models.Sharpen:
-		return [][]float32{
+		kernel = [][]float32{
 			{+0, -1, +0},
 			{-1, +5, -1},
 			{+0, -1, +0},
-		}, nil
+		}
 	case models.EdgeDetectionHorizontal:
-		return [][]float32{
+		kernel = [][]float32{
 			{+1, +0, -1},
 			{+2, +0, -2},
 			{+1, +0, -1},
-		}, nil
+		}
 	case models.EdgeDetectionVertical:
-		return [][]float32{
+		kernel = [][]float32{
 			{+1, +2, +1},
 			{+0, +0, +0},
 			{-1, -2, -1},
-		}, nil
+		}
 	case models.Emboss:
-		return [][]float32{
+		kernel = [][]float32{
 			{-2, +0, -1, +0, +0},
 			{+0, -2, -1, +0, +0},
 			{-1, -1, +1, +1, +1},
 			{+0, +0, +1, +2, +0},
 			{+0, +0, +1, +0, +2},
-		}, nil
+		}
 	}
 
-	return nil, errors.New("No kernel of provided type")
+	return kernel
 }
 
 func GetPixelColor(img image.Image, x, y int) (uint8, uint8, uint8, uint8) {

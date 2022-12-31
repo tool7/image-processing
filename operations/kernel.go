@@ -29,10 +29,7 @@ func (this *kernelOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error
 
 func applyKernel(inputImage *image.RGBA, bounds image.Rectangle, kernelType models.KernelType) *image.RGBA {
 	result := image.NewRGBA(bounds)
-	kernel, err := utils.GetKernelByType(kernelType)
-	if err != nil {
-		panic(err)
-	}
+	kernel := utils.GetKernelByType(kernelType)
 
 	minY := bounds.Min.Y
 	maxY := bounds.Max.Y
