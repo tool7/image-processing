@@ -111,6 +111,7 @@ func (this *ImageLayerCollection) RemoveAt(index int) error {
 		index++
 	}
 
+	current.Next = nil
 	this.Size--
 	return nil
 }
