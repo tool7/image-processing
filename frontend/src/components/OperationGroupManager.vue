@@ -12,6 +12,7 @@ const {
   removeImageOperation,
   updateImageOperation,
   replaceImageOperation,
+  moveImageOperation,
   processImage,
   isLoading,
 } = useImageProcessing();
@@ -75,8 +76,13 @@ const onOperationChange = async (index: number, type: ImageOperationType, level?
   }
 };
 
-const onDragEnd = () => {
-  console.log(operations.value);
+const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => {
+  try {
+    await moveImageOperation(oldIndex, newIndex);
+    await processImage();
+  } catch (err) {
+    console.log(err);
+  }
 };
 </script>
 

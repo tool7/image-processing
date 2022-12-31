@@ -6,6 +6,10 @@ export function AppendImageOperation(arg1) {
   return window['go']['main']['App']['AppendImageOperation'](arg1);
 }
 
+export function MoveImageOperation(arg1, arg2) {
+  return window['go']['main']['App']['MoveImageOperation'](arg1, arg2);
+}
+
 export function OpenImageFileSelector() {
   return window['go']['main']['App']['OpenImageFileSelector']();
 }

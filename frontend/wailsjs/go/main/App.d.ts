@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function AppendImageOperation(arg1:main.ImageOperation):Promise<Error>;
 
+export function MoveImageOperation(arg1:number,arg2:number):Promise<Error>;
+
 export function OpenImageFileSelector():Promise<boolean>;
 
 export function ProcessImage():Promise<main.ProcessedImage>;

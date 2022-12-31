@@ -141,9 +141,7 @@ func (a *App) AppendImageOperation(operation ImageOperation) error {
 }
 
 func (a *App) RemoveImageOperationAtIndex(index int) error {
-	a.imageLayerCollection.RemoveAt(index)
-
-	return nil
+	return a.imageLayerCollection.RemoveAt(index)
 }
 
 func (a *App) UpdateImageOperationAtIndex(index int, operation ImageOperation) error {
@@ -200,6 +198,22 @@ func (a *App) ReplaceImageOperationAtIndex(index int, operation ImageOperation) 
 
 	a.imageLayerCollection.RemoveAt(index)
 	a.imageLayerCollection.InsertAt(imageLayer, index)
+
+	return nil
+}
+
+func (a *App) MoveImageOperation(oldIndex, newIndex int) error {
+	if oldIndex == newIndex {
+		return nil
+	}
+
+	imageLayer, err := a.imageLayerCollection.At(oldIndex)
+	if err != nil {
+		panic(err)
+	}
+
+	a.imageLayerCollection.RemoveAt(oldIndex)
+	a.imageLayerCollection.InsertAt(imageLayer, newIndex)
 
 	return nil
 }
