@@ -41,11 +41,6 @@ const (
 	Emboss
 	EdgesVertical
 	EdgesHorizontal
-	MirrorVertical
-	MirrorHorizontal
-	RotateBy90
-	RotateBy180
-	RotateBy270
 )
 
 type TintRGB struct {
@@ -268,17 +263,49 @@ func CreateImageLayerWithOperation(operation ImageOperation) (*models.ImageLayer
 		break
 	case EdgesHorizontal:
 		break
-	case MirrorVertical:
-		break
-	case MirrorHorizontal:
-		break
-	case RotateBy90:
-		break
-	case RotateBy180:
-		break
-	case RotateBy270:
-		break
 	}
 
 	return nil, errors.New("Failed to create ImageLayer with provided ImageOperation")
+}
+
+func (a *App) RotateImageBy90Deg() error {
+	rotationOperation := operations.NewRotationOperation(operations.By90Deg)
+	rotatedImage, err := rotationOperation.Execute(a.originalImage)
+
+	if err != nil {
+		return err
+	}
+
+	a.originalImage = rotatedImage
+	a.imageLayerCollection.InputImage = rotatedImage
+
+	return nil
+}
+
+func (a *App) MirrorImageVertically() error {
+	verticalMirrorOperation := operations.NewVerticalMirrorOperation()
+	mirroredImage, err := verticalMirrorOperation.Execute(a.originalImage)
+
+	if err != nil {
+		return err
+	}
+
+	a.originalImage = mirroredImage
+	a.imageLayerCollection.InputImage = mirroredImage
+
+	return nil
+}
+
+func (a *App) MirrorImageHorizontally() error {
+	horizontalMirrorOperation := operations.NewHorizontalMirrorOperation()
+	mirroredImage, err := horizontalMirrorOperation.Execute(a.originalImage)
+
+	if err != nil {
+		return err
+	}
+
+	a.originalImage = mirroredImage
+	a.imageLayerCollection.InputImage = mirroredImage
+
+	return nil
 }

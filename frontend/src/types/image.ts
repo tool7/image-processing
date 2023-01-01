@@ -9,11 +9,6 @@ export enum ImageOperationType {
   Emboss,
   EdgesVertical,
   EdgesHorizontal,
-  MirrorVertical,
-  MirrorHorizontal,
-  RotateBy90,
-  RotateBy180,
-  RotateBy270,
 }
 
 export const imageOperationSelectItems: Array<{ type: ImageOperationType; label: string }> = [
@@ -56,26 +51,6 @@ export const imageOperationSelectItems: Array<{ type: ImageOperationType; label:
   {
     type: ImageOperationType.EdgesHorizontal,
     label: "Horizontal edges",
-  },
-  {
-    type: ImageOperationType.MirrorVertical,
-    label: "Vertical mirror",
-  },
-  {
-    type: ImageOperationType.MirrorHorizontal,
-    label: "Horizontal mirror",
-  },
-  {
-    type: ImageOperationType.RotateBy90,
-    label: "Rotate by 90°",
-  },
-  {
-    type: ImageOperationType.RotateBy180,
-    label: "Rotate by 180°",
-  },
-  {
-    type: ImageOperationType.RotateBy270,
-    label: "Rotate by -90°",
   },
 ];
 

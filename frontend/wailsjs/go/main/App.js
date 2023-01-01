@@ -6,6 +6,14 @@ export function AppendImageOperation(arg1) {
   return window['go']['main']['App']['AppendImageOperation'](arg1);
 }
 
+export function MirrorImageHorizontally() {
+  return window['go']['main']['App']['MirrorImageHorizontally']();
+}
+
+export function MirrorImageVertically() {
+  return window['go']['main']['App']['MirrorImageVertically']();
+}
+
 export function MoveImageOperation(arg1, arg2) {
   return window['go']['main']['App']['MoveImageOperation'](arg1, arg2);
 }
@@ -28,6 +36,10 @@ export function ReplaceImageOperationAtIndex(arg1, arg2) {
 
 export function ResetAppState() {
   return window['go']['main']['App']['ResetAppState']();
+}
+
+export function RotateImageBy90Deg() {
+  return window['go']['main']['App']['RotateImageBy90Deg']();
 }
 
 export function ToggleImageOperation(arg1, arg2) {

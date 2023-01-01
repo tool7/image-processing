@@ -38,3 +38,7 @@ body {
 #app {
   height: 100vh;
 }
+
+.rotate-by-90-deg {
+  transform: rotate(90deg);
+}

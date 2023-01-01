@@ -3,6 +3,7 @@ import { ref } from "vue";
 import draggable from "vuedraggable";
 
 import { main } from "../../wailsjs/go/models";
+import TransformationActions from "./TransformationActions.vue";
 import OperationBuilder from "./OperationBuilder.vue";
 import { useImageProcessing } from "../composables/image-processing";
 import { imageOperationSelectItems, ImageOperationType } from "../types/image";
@@ -99,26 +100,30 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
 </script>
 
 <template>
-  <v-menu transition="slide-y-transition">
-    <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props"
-        variant="tonal"
-        size="small"
-        prepend-icon="fas fa-plus"
-        :rounded="0"
-        :disabled="isLoading"
-        class="mb-5"
-      >
-        New Operation
-      </v-btn>
-    </template>
-    <v-list>
-      <v-list-item v-for="(op, i) in imageOperationSelectItems" :key="i" @click="() => onAddOperation(op.type)">
-        <v-list-item-title>{{ op.label }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-menu>
+  <div class="d-flex justify-center align-center mb-5">
+    <v-menu location="center" transition="fade-transition">
+      <template v-slot:activator="{ props }">
+        <v-btn
+          v-bind="props"
+          variant="tonal"
+          size="small"
+          prepend-icon="fas fa-plus"
+          :rounded="0"
+          :disabled="isLoading"
+          class="mr-4"
+        >
+          New Operation
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item v-for="(op, i) in imageOperationSelectItems" :key="i" @click="() => onAddOperation(op.type)">
+          <v-list-item-title>{{ op.label }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
+    <TransformationActions />
+  </div>
 
   <draggable
     v-model="operations"

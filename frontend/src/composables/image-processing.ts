@@ -11,6 +11,9 @@ import {
   ReplaceImageOperationAtIndex,
   MoveImageOperation,
   ToggleImageOperation,
+  RotateImageBy90Deg,
+  MirrorImageVertically,
+  MirrorImageHorizontally,
 } from "../../wailsjs/go/main/App";
 
 const isLoading = ref<boolean>(false);
@@ -70,6 +73,18 @@ const toggleImageOperation = async (index: number, enable: boolean) => {
   await ToggleImageOperation(index, enable);
 };
 
+const rotateImageBy90Deg = async () => {
+  await RotateImageBy90Deg();
+};
+
+const mirrorImageVertically = async () => {
+  await MirrorImageVertically();
+};
+
+const mirrorImageHorizontally = async () => {
+  await MirrorImageHorizontally();
+};
+
 const processImage = async () => {
   setIsLoading(true);
 
@@ -101,6 +116,9 @@ export function useImageProcessing() {
     replaceImageOperation,
     moveImageOperation,
     toggleImageOperation,
+    rotateImageBy90Deg,
+    mirrorImageVertically,
+    mirrorImageHorizontally,
     processImage,
     resetAppState,
   };

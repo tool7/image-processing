@@ -44,7 +44,7 @@ const menuItems = computed<Array<NavbarMenuItem>>(() => {
 
 <template>
   <div id="navbar" style="--wails-draggable: drag">
-    <v-menu>
+    <v-menu transition="fade-transition">
       <template v-slot:activator="{ props }">
         <v-btn
           icon="fas fa-ellipsis-vertical"
