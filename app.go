@@ -38,9 +38,13 @@ const (
 	Greyscale
 	Negative
 	Sepia
+	BoxBlur
+	MotionBlur
+	Sharpen
 	Emboss
-	EdgesVertical
 	EdgesHorizontal
+	EdgesVertical
+	Outline
 )
 
 type TintRGB struct {
@@ -50,9 +54,10 @@ type TintRGB struct {
 }
 
 type ImageOperation struct {
-	Type  ImageOperationType `json:"type"`
-	Level float64            `json:"level,omitempty"`
-	Tint  TintRGB            `json:"tint,omitempty"`
+	Type       ImageOperationType `json:"type"`
+	Level      float64            `json:"level,omitempty"`
+	Tint       TintRGB            `json:"tint,omitempty"`
+	KernelSize models.KernelSize  `json:"kernelSize,omitempty"`
 }
 
 func NewApp() *App {
@@ -180,6 +185,13 @@ func (a *App) UpdateImageOperationAtIndex(index int, operation ImageOperation) e
 			A: 255,
 		}
 		break
+	case BoxBlur, MotionBlur, Sharpen, Emboss:
+		kernelOperation, ok := imageLayer.Operation.(*operations.KernelOperation)
+		if !ok {
+			panic("Failed to cast to KernelOperation")
+		}
+		kernelOperation.KernelSize = operation.KernelSize
+		break
 	}
 
 	return nil
@@ -257,12 +269,27 @@ func CreateImageLayerWithOperation(operation ImageOperation) (*models.ImageLayer
 	case Sepia:
 		sepiaOperation := operations.NewSepiaOperation()
 		return utils.NewImageLayer(sepiaOperation), nil
+	case BoxBlur:
+		boxBlurOperation := operations.NewKernelOperation(models.BoxBlur, operation.KernelSize)
+		return utils.NewImageLayer(boxBlurOperation), nil
+	case MotionBlur:
+		motionBlurOperation := operations.NewKernelOperation(models.MotionBlur, operation.KernelSize)
+		return utils.NewImageLayer(motionBlurOperation), nil
+	case Sharpen:
+		sharpenOperation := operations.NewKernelOperation(models.Sharpen, operation.KernelSize)
+		return utils.NewImageLayer(sharpenOperation), nil
 	case Emboss:
-		break
-	case EdgesVertical:
-		break
+		embossOperation := operations.NewKernelOperation(models.Emboss, operation.KernelSize)
+		return utils.NewImageLayer(embossOperation), nil
 	case EdgesHorizontal:
-		break
+		horizontalEdgeDetectionOperation := operations.NewKernelOperation(models.EdgeDetectionHorizontal, operation.KernelSize)
+		return utils.NewImageLayer(horizontalEdgeDetectionOperation), nil
+	case EdgesVertical:
+		verticalEdgeDetectionOperation := operations.NewKernelOperation(models.EdgeDetectionVertical, operation.KernelSize)
+		return utils.NewImageLayer(verticalEdgeDetectionOperation), nil
+	case Outline:
+		outlineOperation := operations.NewKernelOperation(models.Outline, operation.KernelSize)
+		return utils.NewImageLayer(outlineOperation), nil
 	}
 
 	return nil, errors.New("Failed to create ImageLayer with provided ImageOperation")

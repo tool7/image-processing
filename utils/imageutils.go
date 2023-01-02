@@ -31,59 +31,6 @@ func NewImageLayerCollection(img *image.RGBA) *models.ImageLayerCollection {
 	}
 }
 
-func GetKernelByType(kernelType models.KernelType) [][]float32 {
-	var kernel [][]float32
-
-	switch kernelType {
-	case models.Blur:
-		kernel = [][]float32{
-			{1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0},
-			{2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0},
-			{1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0},
-		}
-	case models.MotionBlur:
-		kernel = [][]float32{
-			{1.0 / 9.0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 1.0 / 9.0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 1.0 / 9.0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 1.0 / 9.0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 1.0 / 9.0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 1.0 / 9.0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1.0 / 9.0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 1.0 / 9.0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 1.0 / 9.0},
-		}
-	case models.Sharpen:
-		kernel = [][]float32{
-			{+0, -1, +0},
-			{-1, +5, -1},
-			{+0, -1, +0},
-		}
-	case models.EdgeDetectionHorizontal:
-		kernel = [][]float32{
-			{+1, +0, -1},
-			{+2, +0, -2},
-			{+1, +0, -1},
-		}
-	case models.EdgeDetectionVertical:
-		kernel = [][]float32{
-			{+1, +2, +1},
-			{+0, +0, +0},
-			{-1, -2, -1},
-		}
-	case models.Emboss:
-		kernel = [][]float32{
-			{-2, +0, -1, +0, +0},
-			{+0, -2, -1, +0, +0},
-			{-1, -1, +1, +1, +1},
-			{+0, +0, +1, +2, +0},
-			{+0, +0, +1, +0, +2},
-		}
-	}
-
-	return kernel
-}
-
 func GetPixelColor(img image.Image, x, y int) (uint8, uint8, uint8, uint8) {
 	r32, g32, b32, a32 := img.At(x, y).RGBA()
 	r := uint8(r32 >> 8)

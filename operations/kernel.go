@@ -9,27 +9,30 @@ import (
 	utils "tool7/image-processing/utils"
 )
 
-type kernelOperation struct {
-	kernelType models.KernelType
+type KernelOperation struct {
+	KernelType models.KernelType
+	KernelSize models.KernelSize
 }
 
-func NewKernelOperation(kernelType models.KernelType) *kernelOperation {
-	return &kernelOperation{
+func NewKernelOperation(kernelType models.KernelType, kernelSize models.KernelSize) *KernelOperation {
+	return &KernelOperation{
 		kernelType,
+		kernelSize,
 	}
 }
 
-func (this *kernelOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) {
+func (this *KernelOperation) Execute(inputImage *image.RGBA) (*image.RGBA, error) {
+	kernel := models.GenerateKernel(this.KernelType, this.KernelSize)
+
 	worker := func(bounds image.Rectangle) *image.RGBA {
-		return applyKernel(inputImage, bounds, this.kernelType)
+		return applyKernel(inputImage, bounds, kernel)
 	}
 
 	return utils.ProcessImageConcurrently(*inputImage, worker)
 }
 
-func applyKernel(inputImage *image.RGBA, bounds image.Rectangle, kernelType models.KernelType) *image.RGBA {
+func applyKernel(inputImage *image.RGBA, bounds image.Rectangle, kernel [][]float32) *image.RGBA {
 	result := image.NewRGBA(bounds)
-	kernel := utils.GetKernelByType(kernelType)
 
 	minY := bounds.Min.Y
 	maxY := bounds.Max.Y

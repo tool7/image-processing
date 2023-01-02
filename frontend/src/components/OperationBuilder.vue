@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (e: "change", type: ImageOperationType, level?: number, tint?: main.TintRGB): void;
+  (e: "change", type: ImageOperationType, level?: number, tint?: main.TintRGB, kernelSize?: number): void;
   (e: "remove"): void;
   (e: "toggle"): void;
 }>();
@@ -27,6 +27,7 @@ const { isLoading } = useImageProcessing();
 const selectedOperationType = ref<ImageOperationType>(props.initialOperationType);
 const selectedLevel = ref<number>(1);
 const selectedTint = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
+const selectedKernelSize = ref<number>(3);
 const selectedColorPickerValue = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
 const isColorPickerOpen = ref<boolean>(false);
 
@@ -38,16 +39,17 @@ const onColorSelect = () => {
   isColorPickerOpen.value = false;
 };
 
-watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValues) => {
+watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], (newValues, oldValues) => {
   const oldOperationType = oldValues[0];
   const newOperationType = newValues[0];
 
   if (oldOperationType !== newOperationType) {
     selectedLevel.value = 1;
     selectedTint.value = { r: 0, g: 0, b: 255 };
+    selectedKernelSize.value = 3;
   }
 
-  emit("change", selectedOperationType.value, selectedLevel.value, selectedTint.value);
+  emit("change", selectedOperationType.value, selectedLevel.value, selectedTint.value, selectedKernelSize.value);
 });
 </script>
 
@@ -167,6 +169,29 @@ watch([selectedOperationType, selectedLevel, selectedTint], (newValues, oldValue
             </v-card-actions>
           </v-card>
         </v-dialog>
+      </div>
+
+      <div
+        v-if="
+          [
+            ImageOperationType.BoxBlur,
+            ImageOperationType.MotionBlur,
+            ImageOperationType.Sharpen,
+            ImageOperationType.Emboss,
+          ].includes(selectedOperationType)
+        "
+        class="controls"
+      >
+        <div class="text-caption">Kernel size</div>
+        <Slider
+          v-model="selectedKernelSize"
+          v-bind="null"
+          :min="3"
+          :max="9"
+          :step="2"
+          :format="(v: number) => v"
+          show-tooltip="drag"
+        />
       </div>
     </v-card-item>
   </v-card>

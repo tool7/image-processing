@@ -20,6 +20,7 @@ export namespace main {
 	    type: number;
 	    level?: number;
 	    tint?: TintRGB;
+	    kernelSize?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageOperation(source);
@@ -30,6 +31,7 @@ export namespace main {
 	        this.type = source["type"];
 	        this.level = source["level"];
 	        this.tint = this.convertValues(source["tint"], TintRGB);
+	        this.kernelSize = source["kernelSize"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
