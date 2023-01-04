@@ -12,7 +12,7 @@ export function MoveImageOperation(arg1:number,arg2:number):Promise<Error>;
 
 export function OpenImageFileSelector():Promise<boolean>;
 
-export function ProcessImage():Promise<main.ProcessedImage>;
+export function ProcessImage(arg1:number):Promise<main.ProcessedImage>;
 
 export function RemoveImageOperationAtIndex(arg1:number):Promise<Error>;
 

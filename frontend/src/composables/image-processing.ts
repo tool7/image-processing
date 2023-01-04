@@ -37,7 +37,7 @@ const openImageFileSelector = async () => {
       return;
     }
 
-    const result = await ProcessImage();
+    const result = await ProcessImage(0);
     setProcessedImage(result);
   } catch (err) {
     throw err;
@@ -85,11 +85,15 @@ const mirrorImageHorizontally = async () => {
   await MirrorImageHorizontally();
 };
 
-const processImage = async () => {
+const processImage = async (indexToExecuteFrom: number = 0) => {
+  if (indexToExecuteFrom < 0) {
+    indexToExecuteFrom = 0;
+  }
+
   setIsLoading(true);
 
   try {
-    const result = await ProcessImage();
+    const result = await ProcessImage(indexToExecuteFrom);
     setProcessedImage(result);
   } catch (err) {
     throw err;

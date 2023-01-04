@@ -22,8 +22,8 @@ export function OpenImageFileSelector() {
   return window['go']['main']['App']['OpenImageFileSelector']();
 }
 
-export function ProcessImage() {
-  return window['go']['main']['App']['ProcessImage']();
+export function ProcessImage(arg1) {
+  return window['go']['main']['App']['ProcessImage'](arg1);
 }
 
 export function RemoveImageOperationAtIndex(arg1) {

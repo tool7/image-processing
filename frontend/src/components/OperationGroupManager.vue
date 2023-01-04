@@ -20,18 +20,13 @@ const {
 } = useImageProcessing();
 
 const operations = ref<Array<{ id: number; operation: main.ImageOperation; isEnabled: boolean }>>([]);
-
-const dragOptions = {
-  animation: 200,
-  group: "description",
-  disabled: false,
-  ghostClass: "ghost",
-};
+const dragOptions = { animation: 200, group: "description", disabled: false, ghostClass: "ghost" };
 
 // TODO: Use nanoid ?
 let id = 0;
 
 const onAddOperation = async (type: ImageOperationType) => {
+  const lastOperationIndex = operations.value.length - 1;
   const operation = new main.ImageOperation({
     type,
     level: 1,
@@ -44,7 +39,7 @@ const onAddOperation = async (type: ImageOperationType) => {
 
   try {
     await addImageOperation(operation);
-    await processImage();
+    await processImage(lastOperationIndex);
   } catch (err) {
     console.log(err);
   }
@@ -55,7 +50,7 @@ const onRemoveOperation = async (index: number) => {
     await removeImageOperation(index);
     operations.value.splice(index, 1);
 
-    await processImage();
+    await processImage(index);
   } catch (err) {
     console.log(err);
   }
@@ -66,7 +61,7 @@ const onToggleOperation = async (index: number, isEnabled: boolean) => {
     await toggleImageOperation(index, !isEnabled);
     operations.value[index].isEnabled = !isEnabled;
 
-    await processImage();
+    await processImage(index);
   } catch (err) {
     console.log(err);
   }
@@ -95,16 +90,18 @@ const onOperationChange = async (
       operations.value[index].operation.type = type;
     }
 
-    await processImage();
+    await processImage(index);
   } catch (err) {
     console.log(err);
   }
 };
 
 const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => {
+  const indexToProcessImageFrom = Math.min(oldIndex, newIndex);
+
   try {
     await moveImageOperation(oldIndex, newIndex);
-    await processImage();
+    await processImage(indexToProcessImageFrom);
   } catch (err) {
     console.log(err);
   }

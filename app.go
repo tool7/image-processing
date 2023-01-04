@@ -100,11 +100,11 @@ func (a *App) OpenImageFileSelector() bool {
 	return true
 }
 
-func (a *App) ProcessImage() ProcessedImage {
+func (a *App) ProcessImage(indexToExecuteFrom int) ProcessedImage {
 	var buff bytes.Buffer
 
 	if a.imageLayerCollection.Size > 0 {
-		processedImage, err := a.imageLayerCollection.ExecuteLayersFrom(0)
+		processedImage, err := a.imageLayerCollection.ExecuteLayersFrom(indexToExecuteFrom)
 		if err != nil {
 			panic(err)
 		}
