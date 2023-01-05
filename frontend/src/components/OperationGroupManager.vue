@@ -135,7 +135,7 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
     v-bind="dragOptions"
     item-key="id"
     handle=".reorder-handle"
-    class="d-flex"
+    class="d-flex overflow-x-auto pb-4"
     @end="onDragEnd"
   >
     <template #item="{ element, index }">
