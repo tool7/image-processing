@@ -45,15 +45,19 @@ const menuItems = computed<Array<NavbarMenuItem>>(() => {
 <template>
   <div id="navbar" style="--wails-draggable: drag">
     <v-menu transition="fade-transition">
-      <template v-slot:activator="{ props }">
-        <v-btn
-          icon="fas fa-ellipsis-vertical"
-          v-bind="props"
-          size="x-small"
-          variant="text"
-          :rounded="0"
-          style="--wails-draggable: none"
-        ></v-btn>
+      <template v-slot:activator="{ props: menuProps }">
+        <v-hover>
+          <template v-slot:default="{ isHovering, props: hoverProps }">
+            <v-btn
+              :icon="!isHovering ? 'fas fa-bars' : 'fas fa-bars-staggered'"
+              v-bind="{ ...menuProps, ...hoverProps }"
+              size="x-small"
+              variant="text"
+              :rounded="0"
+              style="--wails-draggable: none"
+            ></v-btn>
+          </template>
+        </v-hover>
       </template>
 
       <v-list>
