@@ -39,6 +39,19 @@ const onColorSelect = () => {
   isColorPickerOpen.value = false;
 };
 
+const kernelSizeSliderFormat = (value: number) => {
+  switch (value) {
+    case 3:
+      return 1;
+    case 5:
+      return 2;
+    case 7:
+      return 3;
+    case 9:
+      return 4;
+  }
+};
+
 watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], (newValues, oldValues) => {
   const oldOperationType = oldValues[0];
   const newOperationType = newValues[0];
@@ -54,7 +67,7 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
 </script>
 
 <template>
-  <v-card :disabled="isLoading" height="100%" width="240" max-width="240" variant="tonal" :rounded="1">
+  <v-card :disabled="isLoading" height="100%" width="240" min-width="240" variant="tonal" :rounded="1">
     <div class="d-flex justify-space-between">
       <div>
         <v-btn
@@ -65,14 +78,19 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
           class="remove-btn"
           @click="onRemove"
         />
-        <v-btn
-          variant="tonal"
-          size="x-small"
-          :icon="isEnabled ? 'fas fa-eye' : 'fas fa-eye-slash'"
-          :rounded="0"
-          class="toggle-btn"
-          @click="onToggle"
-        />
+        <v-tooltip :text="isEnabled ? 'Disable' : 'Enable'" location="top">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              variant="tonal"
+              size="x-small"
+              :icon="isEnabled ? 'fas fa-eye' : 'fas fa-eye-slash'"
+              :rounded="0"
+              class="toggle-btn"
+              @click="onToggle"
+            />
+          </template>
+        </v-tooltip>
       </div>
       <v-btn variant="plain" size="small" icon="fas fa-grip-lines" :rounded="0" class="reorder-handle" />
     </div>
@@ -87,9 +105,10 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
         single-line
         density="compact"
         variant="solo"
+        class="operation-type-select mb-2"
       />
 
-      <div v-if="selectedOperationType === ImageOperationType.Brightness" class="controls">
+      <div v-if="selectedOperationType === ImageOperationType.Brightness" class="mt-4">
         <div class="text-caption">Level</div>
         <Slider
           v-model="selectedLevel"
@@ -99,10 +118,11 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
           :step="0.2"
           :format="(v: number) => v"
           show-tooltip="drag"
+          class="mx-3 my-3"
         />
       </div>
 
-      <div v-if="selectedOperationType === ImageOperationType.Contrast" class="controls">
+      <div v-if="selectedOperationType === ImageOperationType.Contrast" class="mt-4">
         <div class="text-caption">Factor</div>
         <Slider
           v-model="selectedLevel"
@@ -112,10 +132,11 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
           :step="0.1"
           :format="(v: number) => v"
           show-tooltip="drag"
+          class="mx-3 my-3"
         />
       </div>
 
-      <div v-if="selectedOperationType === ImageOperationType.Saturation" class="controls">
+      <div v-if="selectedOperationType === ImageOperationType.Saturation" class="mt-4">
         <div class="text-caption">Level</div>
         <Slider
           v-model="selectedLevel"
@@ -125,36 +146,27 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
           :step="0.1"
           :format="(v: number) => v"
           show-tooltip="drag"
+          class="mx-3 my-3"
         />
       </div>
 
-      <div v-if="selectedOperationType === ImageOperationType.Tint" class="controls">
-        <div class="text-caption">Intensity</div>
-        <Slider
-          v-model="selectedLevel"
-          v-bind="null"
-          :min="0"
-          :max="1"
-          :step="0.01"
-          :format="(v: number) => v"
-          show-tooltip="drag"
-        />
-
+      <div
+        v-if="selectedOperationType === ImageOperationType.Tint"
+        class="mt-4 d-flex justify-space-between align-center"
+      >
         <v-dialog v-model="isColorPickerOpen" :max-width="340">
           <template v-slot:activator="{ props }">
             <v-btn
-              id="tint-picker-btn"
               v-bind="props"
               :color="rgbToHex(selectedTint.r, selectedTint.g, selectedTint.b, 140)"
-              prepend-icon="fas fa-palette"
-              variant="flat"
-              size="small"
-              class="mb-2"
-            >
-              Color
-            </v-btn>
+              icon="fas fa-palette"
+              variant="elevated"
+              size="x-small"
+              class="mt-2"
+            />
           </template>
           <v-card>
+            <v-card-title>Choose color</v-card-title>
             <v-card-text>
               <v-color-picker
                 v-model="selectedColorPickerValue"
@@ -165,10 +177,24 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
               />
             </v-card-text>
             <v-card-actions class="d-flex justify-center">
-              <v-btn variant="tonal" class="mb-3 px-4" @click="onColorSelect">Confirm</v-btn>
+              <v-btn variant="tonal" size="small" class="mb-3 px-4" @click="onColorSelect">Confirm</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <div class="w-100">
+          <div class="text-caption">Intensity</div>
+          <Slider
+            v-model="selectedLevel"
+            v-bind="null"
+            :min="0"
+            :max="1"
+            :step="0.01"
+            :format="(v: number) => v"
+            show-tooltip="drag"
+            class="mx-3 my-3"
+          />
+        </div>
       </div>
 
       <div
@@ -180,17 +206,18 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
             ImageOperationType.Emboss,
           ].includes(selectedOperationType)
         "
-        class="controls"
+        class="mt-4"
       >
-        <div class="text-caption">Kernel size</div>
+        <div class="text-caption">Strength</div>
         <Slider
           v-model="selectedKernelSize"
           v-bind="null"
           :min="3"
           :max="9"
           :step="2"
-          :format="(v: number) => v"
+          :format="kernelSizeSliderFormat"
           show-tooltip="drag"
+          class="mx-3 my-3"
         />
       </div>
     </v-card-item>
@@ -215,12 +242,8 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
   border-bottom-right-radius: 6px !important;
 }
 
-.controls > .slider-horizontal {
-  margin: 8px 12px;
-}
-
-#tint-picker-btn {
-  margin-top: 20px;
+.operation-type-select :deep(.v-input__details) {
+  display: none !important;
 }
 
 .v-color-picker :deep(.v-color-picker-preview) {
