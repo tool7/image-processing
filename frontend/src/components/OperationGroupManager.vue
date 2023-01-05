@@ -46,6 +46,9 @@ const onRemoveOperation = async (index: number) => {
     await removeImageOperation(index);
     operations.value.splice(index, 1);
 
+    if (operations.value.length === index) {
+      index -= 1;
+    }
     await processImage(index);
   } catch (err) {
     console.log(err);
