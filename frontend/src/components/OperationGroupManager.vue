@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import draggable from "vuedraggable";
+import { nanoid } from "nanoid";
 
 import { main } from "../../wailsjs/go/models";
 import TransformationActions from "./TransformationActions.vue";
@@ -19,11 +20,8 @@ const {
   isLoading,
 } = useImageProcessing();
 
-const operations = ref<Array<{ id: number; operation: main.ImageOperation; isEnabled: boolean }>>([]);
+const operations = ref<Array<{ id: string; operation: main.ImageOperation; isEnabled: boolean }>>([]);
 const dragOptions = { animation: 200, group: "description", disabled: false, ghostClass: "ghost" };
-
-// TODO: Use nanoid ?
-let id = 0;
 
 const onAddOperation = async (type: ImageOperationType) => {
   const lastOperationIndex = operations.value.length - 1;
@@ -33,9 +31,7 @@ const onAddOperation = async (type: ImageOperationType) => {
     tint: { r: 0, g: 0, b: 255 },
     kernelSize: 3,
   });
-  operations.value.push({ id, operation, isEnabled: true });
-
-  id++;
+  operations.value.push({ id: nanoid(), operation, isEnabled: true });
 
   try {
     await addImageOperation(operation);

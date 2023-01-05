@@ -8,8 +8,12 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "16.2.0"
+  },
   "dependencies": {
     "@vueform/slider": "^2.1.6",
+    "nanoid": "^3.3.4",
     "vue": "^3.2.37",
     "vuedraggable": "^4.1.0",
     "vuetify": "^3.0.6"
