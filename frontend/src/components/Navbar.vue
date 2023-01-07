@@ -30,7 +30,7 @@ const menuItems = computed<Array<NavbarMenuItem>>(() => {
       title: "Export PNG",
       icon: "fas fa-file-image",
       isEnabled: Boolean(processedImage.value) && !isLoading.value,
-      onClick: () => exportPng(processedImage.value!.base64),
+      onClick: () => exportPng(),
     },
     {
       title: "Reset All",

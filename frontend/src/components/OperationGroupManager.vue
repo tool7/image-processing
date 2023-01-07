@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from "vue";
 import draggable from "vuedraggable";
 import { nanoid } from "nanoid";
 
@@ -10,6 +9,7 @@ import { useImageProcessing } from "../composables/image-processing";
 import { imageOperationSelectItems, ImageOperationType } from "../types/image";
 
 const {
+  operationDraggableItems,
   addImageOperation,
   removeImageOperation,
   updateImageOperation,
@@ -20,18 +20,17 @@ const {
   isLoading,
 } = useImageProcessing();
 
-const operations = ref<Array<{ id: string; operation: main.ImageOperation; isEnabled: boolean }>>([]);
 const dragOptions = { animation: 200, group: "description", disabled: false, ghostClass: "ghost" };
 
 const onAddOperation = async (type: ImageOperationType) => {
-  const lastOperationIndex = operations.value.length - 1;
+  const lastOperationIndex = operationDraggableItems.value.length - 1;
   const operation = new main.ImageOperation({
     type,
     level: 1,
     tint: { r: 0, g: 0, b: 255 },
     kernelSize: 3,
   });
-  operations.value.push({ id: nanoid(), operation, isEnabled: true });
+  operationDraggableItems.value.push({ id: nanoid(), operation, isEnabled: true });
 
   try {
     await addImageOperation(operation);
@@ -44,9 +43,9 @@ const onAddOperation = async (type: ImageOperationType) => {
 const onRemoveOperation = async (index: number) => {
   try {
     await removeImageOperation(index);
-    operations.value.splice(index, 1);
+    operationDraggableItems.value.splice(index, 1);
 
-    if (operations.value.length === index) {
+    if (operationDraggableItems.value.length === index) {
       index -= 1;
     }
     await processImage(index);
@@ -58,7 +57,7 @@ const onRemoveOperation = async (index: number) => {
 const onToggleOperation = async (index: number, isEnabled: boolean) => {
   try {
     await toggleImageOperation(index, !isEnabled);
-    operations.value[index].isEnabled = !isEnabled;
+    operationDraggableItems.value[index].isEnabled = !isEnabled;
 
     await processImage(index);
   } catch (err) {
@@ -73,7 +72,7 @@ const onOperationChange = async (
   tint?: main.TintRGB,
   kernelSize?: number
 ) => {
-  const changedOperation = operations.value[index].operation;
+  const changedOperation = operationDraggableItems.value[index].operation;
 
   try {
     if (changedOperation.type === type) {
@@ -86,7 +85,7 @@ const onOperationChange = async (
       const newOperation = new main.ImageOperation({ type, level, tint, kernelSize });
       await replaceImageOperation(index, newOperation);
 
-      operations.value[index].operation.type = type;
+      operationDraggableItems.value[index].operation.type = type;
     }
 
     await processImage(index);
@@ -134,7 +133,7 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
   </div>
 
   <draggable
-    v-model="operations"
+    v-model="operationDraggableItems"
     v-bind="dragOptions"
     item-key="id"
     handle=".reorder-handle"

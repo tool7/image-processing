@@ -4,6 +4,7 @@ import { main } from "../../wailsjs/go/models";
 import {
   OpenImageFileSelector,
   ProcessImage,
+  SetOriginalImage,
   ResetAppState,
   AppendImageOperation,
   RemoveImageOperationAtIndex,
@@ -15,16 +16,15 @@ import {
   MirrorImageVertically,
   MirrorImageHorizontally,
 } from "../../wailsjs/go/main/App";
+import { ImageOperationDraggableItem } from "../types/image";
 
 const isLoading = ref<boolean>(false);
+const originalImage = ref<main.ProcessedImage | undefined>();
 const processedImage = ref<main.ProcessedImage | undefined>();
+const operationDraggableItems = ref<Array<ImageOperationDraggableItem>>([]);
 
 const setIsLoading = (value: boolean) => {
   isLoading.value = value;
-};
-
-const setProcessedImage = (image?: main.ProcessedImage) => {
-  processedImage.value = image;
 };
 
 const openImageFileSelector = async () => {
@@ -38,12 +38,21 @@ const openImageFileSelector = async () => {
     }
 
     const result = await ProcessImage(0);
-    setProcessedImage(result);
+
+    originalImage.value = result;
+    processedImage.value = result;
   } catch (err) {
     throw err;
   } finally {
     setIsLoading(false);
   }
+};
+
+const setOriginalImageBase64 = async (image: main.ProcessedImage) => {
+  // TODO: Improve
+  const base64 = image.base64.substring(image.base64.indexOf("base64,") + 7);
+  await SetOriginalImage(base64);
+  originalImage.value = image;
 };
 
 const addImageOperation = async (operation: main.ImageOperation) => {
@@ -94,7 +103,7 @@ const processImage = async (indexToExecuteFrom: number = 0) => {
 
   try {
     const result = await ProcessImage(indexToExecuteFrom);
-    setProcessedImage(result);
+    processedImage.value = result;
   } catch (err) {
     throw err;
   } finally {
@@ -106,13 +115,17 @@ const resetAppState = async () => {
   await ResetAppState();
 
   setIsLoading(false);
-  setProcessedImage(undefined);
+  processedImage.value = undefined;
+  operationDraggableItems.value = [];
 };
 
 export function useImageProcessing() {
   return {
     isLoading: readonly(isLoading),
+    originalImage: readonly(originalImage),
     processedImage: readonly(processedImage),
+    setOriginalImageBase64,
+    operationDraggableItems,
     openImageFileSelector,
     addImageOperation,
     removeImageOperation,

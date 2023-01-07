@@ -7,6 +7,8 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"os"
+	"strings"
 
 	"tool7/image-processing/models"
 	"tool7/image-processing/operations"
@@ -78,11 +80,9 @@ func (a *App) OpenImageFileSelector() bool {
 			},
 		},
 	})
-
 	if err != nil {
 		panic("Error on image file selection")
 	}
-
 	if filePath == "" {
 		return false
 	}
@@ -98,6 +98,45 @@ func (a *App) OpenImageFileSelector() bool {
 	a.imageLayerCollection = imageLayerCollection
 
 	return true
+}
+
+func (a *App) SetOriginalImage(imageBase64 string) {
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(imageBase64))
+	decodedImage, _, err := image.Decode(reader)
+
+	if err != nil {
+		panic(err)
+	}
+
+	a.originalImage = decodedImage.(*image.RGBA)
+
+	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
+	a.imageLayerCollection = imageLayerCollection
+}
+
+func (a *App) GetUserSelectedProjectFileContent() string {
+	filePath, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Select Project File (.goimp extension)",
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Files (*.goimp)",
+				Pattern:     "*.goimp",
+			},
+		},
+	})
+	if err != nil {
+		panic("Error on project file selection")
+	}
+	if filePath == "" {
+		return ""
+	}
+
+	byteData, err := os.ReadFile(filePath)
+	if err != nil {
+		panic("Error reading project file")
+	}
+
+	return string(byteData)
 }
 
 func (a *App) ProcessImage(indexToExecuteFrom int) ProcessedImage {
@@ -125,8 +164,8 @@ func (a *App) ProcessImage(indexToExecuteFrom int) ProcessedImage {
 }
 
 func (a *App) ResetAppState() {
-	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
-	a.imageLayerCollection = imageLayerCollection
+	a.originalImage = nil
+	a.imageLayerCollection = nil
 }
 
 func (a *App) AppendImageOperation(operation ImageOperation) error {

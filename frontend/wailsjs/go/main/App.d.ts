@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function AppendImageOperation(arg1:main.ImageOperation):Promise<Error>;
 
+export function GetUserSelectedProjectFileContent():Promise<string>;
+
 export function MirrorImageHorizontally():Promise<Error>;
 
 export function MirrorImageVertically():Promise<Error>;
@@ -21,6 +23,8 @@ export function ReplaceImageOperationAtIndex(arg1:number,arg2:main.ImageOperatio
 export function ResetAppState():Promise<void>;
 
 export function RotateImageBy90Deg():Promise<Error>;
+
+export function SetOriginalImage(arg1:string):Promise<void>;
 
 export function ToggleImageOperation(arg1:number,arg2:boolean):Promise<Error>;
 

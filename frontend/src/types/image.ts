@@ -1,3 +1,5 @@
+import { main } from "../../wailsjs/go/models";
+
 export enum ImageOperationType {
   Brightness = 1,
   Contrast,
@@ -31,6 +33,12 @@ export const imageOperationSelectItems: Array<{ type: ImageOperationType; label:
   { type: ImageOperationType.EdgesVertical, label: "Vertical edges" },
   { type: ImageOperationType.Outline, label: "Outline" },
 ];
+
+export interface ImageOperationDraggableItem {
+  id: string;
+  operation: main.ImageOperation;
+  isEnabled: boolean;
+}
 
 const colorComponentToHex = (c: number) => {
   var hex = c.toString(16);

@@ -6,6 +6,10 @@ export function AppendImageOperation(arg1) {
   return window['go']['main']['App']['AppendImageOperation'](arg1);
 }
 
+export function GetUserSelectedProjectFileContent() {
+  return window['go']['main']['App']['GetUserSelectedProjectFileContent']();
+}
+
 export function MirrorImageHorizontally() {
   return window['go']['main']['App']['MirrorImageHorizontally']();
 }
@@ -40,6 +44,10 @@ export function ResetAppState() {
 
 export function RotateImageBy90Deg() {
   return window['go']['main']['App']['RotateImageBy90Deg']();
+}
+
+export function SetOriginalImage(arg1) {
+  return window['go']['main']['App']['SetOriginalImage'](arg1);
 }
 
 export function ToggleImageOperation(arg1, arg2) {
