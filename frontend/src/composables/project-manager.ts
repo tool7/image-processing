@@ -1,6 +1,6 @@
 import { GetUserSelectedProjectFileContent } from "../../wailsjs/go/main/App";
 import { ProjectState } from "../types/project";
-import { useImageProcessing } from "../composables/image-processing";
+import { useImageProcessing } from "./image-processing";
 
 const {
   originalImage,
@@ -73,7 +73,7 @@ const exportPng = async () => {
   downloadFile(file);
 };
 
-export function useFileManager() {
+export function useProjectManager() {
   return {
     loadProject,
     saveProject,

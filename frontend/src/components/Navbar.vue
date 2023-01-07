@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { WindowMinimise, WindowToggleMaximise, Quit } from "../../wailsjs/runtime/runtime";
-import { useFileManager } from "../composables/file-manager";
+import { useProjectManager } from "../composables/project-manager";
 import { useImageProcessing } from "../composables/image-processing";
 import { NavbarMenuItem } from "../types/navbar";
 
 const { processedImage, resetAppState, isLoading } = useImageProcessing();
-const { loadProject, saveProject, exportPng } = useFileManager();
+const { loadProject, saveProject, exportPng } = useProjectManager();
 
 const onMinimise = () => WindowMinimise();
 const onToggleMaximise = () => WindowToggleMaximise();
