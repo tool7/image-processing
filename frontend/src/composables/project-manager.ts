@@ -1,6 +1,11 @@
+import { readonly, ref } from "vue";
+
 import { GetUserSelectedProjectFileContent } from "../../wailsjs/go/main/App";
 import { ProjectState } from "../types/project";
 import { useImageProcessing } from "./image-processing";
+
+const isLoading = ref<boolean>(false);
+const isSaving = ref<boolean>(false);
 
 const {
   processedImage,
@@ -38,6 +43,7 @@ const loadProject = async () => {
   }
 
   const projectState: ProjectState = JSON.parse(selectedProjectFileContent);
+  isLoading.value = true;
 
   try {
     await resetAppState();
@@ -50,17 +56,27 @@ const loadProject = async () => {
     await processImage();
   } catch (err) {
     console.log(err);
+  } finally {
+    isLoading.value = false;
   }
 };
 
 const saveProject = async () => {
-  const originalImage = await getOriginalImage();
-  const operations = operationDraggableItems.value.map(({ operation }) => operation);
-  const projectState: ProjectState = { originalImage, operations };
+  isSaving.value = true;
 
-  const jsonString = JSON.stringify(projectState);
-  const file = new File([jsonString], "image-processing-project.goimp");
-  downloadFile(file);
+  try {
+    const originalImage = await getOriginalImage();
+    const operations = operationDraggableItems.value.map(({ operation }) => operation);
+    const projectState: ProjectState = { originalImage, operations };
+    const projectStateString = JSON.stringify(projectState);
+
+    const file = new File([projectStateString], "image-processing-project.goimp");
+    downloadFile(file);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 const exportPng = async () => {
@@ -75,6 +91,8 @@ const exportPng = async () => {
 
 export function useProjectManager() {
   return {
+    isLoading: readonly(isLoading),
+    isSaving: readonly(isSaving),
     loadProject,
     saveProject,
     exportPng,

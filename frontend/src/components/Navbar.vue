@@ -5,37 +5,47 @@ import { useProjectManager } from "../composables/project-manager";
 import { useImageProcessing } from "../composables/image-processing";
 import { NavbarMenuItem } from "../types/navbar";
 
-const { processedImage, resetAppState, isLoading } = useImageProcessing();
-const { loadProject, saveProject, exportPng } = useProjectManager();
+const { processedImage, resetAppState, isLoading: isProcessingImage } = useImageProcessing();
+const {
+  loadProject,
+  saveProject,
+  exportPng,
+  isLoading: isLoadingProject,
+  isSaving: isSavingProject,
+} = useProjectManager();
 
 const onMinimise = () => WindowMinimise();
 const onToggleMaximise = () => WindowToggleMaximise();
 const onQuit = () => Quit();
 
+const isAppLoading = computed<boolean>(() => {
+  return isProcessingImage.value || isLoadingProject.value || isSavingProject.value;
+});
+
 const menuItems = computed<Array<NavbarMenuItem>>(() => {
   return [
     {
-      title: "Load Project",
+      title: "Open Project",
       icon: "fas fa-file-import",
-      isEnabled: !isLoading.value,
+      isEnabled: !isAppLoading.value,
       onClick: () => loadProject(),
     },
     {
       title: "Save Project",
       icon: "fas fa-floppy-disk",
-      isEnabled: Boolean(processedImage.value) && !isLoading.value,
+      isEnabled: !isAppLoading.value && Boolean(processedImage.value),
       onClick: () => saveProject(),
     },
     {
       title: "Export PNG",
       icon: "fas fa-file-image",
-      isEnabled: Boolean(processedImage.value) && !isLoading.value,
+      isEnabled: !isAppLoading.value && Boolean(processedImage.value),
       onClick: () => exportPng(),
     },
     {
       title: "Reset All",
       icon: "fas fa-trash-can",
-      isEnabled: !isLoading.value,
+      isEnabled: !isAppLoading.value && Boolean(processedImage.value),
       onClick: () => resetAppState(),
     },
   ];

@@ -4,6 +4,7 @@ import Slider from "@vueform/slider";
 
 import { main } from "../../wailsjs/go/models";
 import { useImageProcessing } from "../composables/image-processing";
+import { useProjectManager } from "../composables/project-manager";
 import { ImageOperationType, imageOperationSelectItems, rgbToHex } from "../types/image";
 
 const props = defineProps({
@@ -23,7 +24,8 @@ const emit = defineEmits<{
   (e: "toggle"): void;
 }>();
 
-const { isLoading } = useImageProcessing();
+const { isLoading: isProcessingImage } = useImageProcessing();
+const { isSaving: isSavingProject } = useProjectManager();
 const selectedOperationType = ref<ImageOperationType>(props.initialOperation.type);
 const selectedLevel = ref<number>(props.initialOperation.level ?? 1);
 const selectedTint = ref<main.TintRGB>(props.initialOperation.tint ?? { r: 0, g: 0, b: 255 });
@@ -67,7 +69,14 @@ watch([selectedOperationType, selectedLevel, selectedTint, selectedKernelSize], 
 </script>
 
 <template>
-  <v-card :disabled="isLoading" height="100%" width="240" min-width="240" variant="tonal" :rounded="1">
+  <v-card
+    :disabled="isProcessingImage || isSavingProject"
+    height="100%"
+    width="240"
+    min-width="240"
+    variant="tonal"
+    :rounded="1"
+  >
     <div class="d-flex justify-space-between">
       <div>
         <v-btn

@@ -2,9 +2,10 @@
 import draggable from "vuedraggable";
 
 import { main } from "../../wailsjs/go/models";
+import { useImageProcessing } from "../composables/image-processing";
+import { useProjectManager } from "../composables/project-manager";
 import TransformationActions from "./TransformationActions.vue";
 import OperationBuilder from "./OperationBuilder.vue";
-import { useImageProcessing } from "../composables/image-processing";
 import { imageOperationSelectItems, ImageOperationType } from "../types/image";
 
 const {
@@ -16,8 +17,9 @@ const {
   moveImageOperation,
   toggleImageOperation,
   processImage,
-  isLoading,
+  isLoading: isProcessingImage,
 } = useImageProcessing();
+const { isSaving: isSavingProject } = useProjectManager();
 
 const dragOptions = { animation: 200, group: "description", disabled: false, ghostClass: "ghost" };
 
@@ -109,7 +111,7 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
           size="small"
           prepend-icon="fas fa-plus"
           :rounded="0"
-          :disabled="isLoading"
+          :disabled="isProcessingImage || isSavingProject"
           class="mr-4"
         >
           New Operation
@@ -122,7 +124,7 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
       </v-list>
     </v-menu>
 
-    <TransformationActions />
+    <TransformationActions :disabled="isProcessingImage || isSavingProject" />
   </div>
 
   <draggable

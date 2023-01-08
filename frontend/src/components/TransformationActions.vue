@@ -1,8 +1,14 @@
 <script lang="ts" setup>
 import { useImageProcessing } from "../composables/image-processing";
 
-const { rotateImageBy90Deg, mirrorImageVertically, mirrorImageHorizontally, processImage, isLoading } =
-  useImageProcessing();
+const componentProps = defineProps({
+  disabled: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const { rotateImageBy90Deg, mirrorImageVertically, mirrorImageHorizontally, processImage } = useImageProcessing();
 
 const rotateImageBy90Degrees = async () => {
   try {
@@ -41,7 +47,7 @@ const applyHorizontalMirrorToImage = async () => {
           variant="tonal"
           icon="fas fa-arrow-rotate-right"
           size="x-small"
-          :disabled="isLoading"
+          :disabled="componentProps.disabled"
           :rounded="0"
           @click="rotateImageBy90Degrees"
         />
@@ -55,7 +61,7 @@ const applyHorizontalMirrorToImage = async () => {
           variant="tonal"
           icon="fas fa-arrow-down-up-across-line"
           size="x-small"
-          :disabled="isLoading"
+          :disabled="componentProps.disabled"
           :rounded="0"
           @click="applyVerticalMirrorToImage"
           class="rotate-by-90-deg"
@@ -70,7 +76,7 @@ const applyHorizontalMirrorToImage = async () => {
           variant="tonal"
           icon="fas fa-arrow-down-up-across-line"
           size="x-small"
-          :disabled="isLoading"
+          :disabled="componentProps.disabled"
           :rounded="0"
           @click="applyHorizontalMirrorToImage"
         />

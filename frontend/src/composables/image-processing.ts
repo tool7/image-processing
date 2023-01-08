@@ -126,7 +126,6 @@ const processImage = async (indexToExecuteFrom: number = 0) => {
 const resetAppState = async () => {
   await ResetAppState();
 
-  setIsLoading(false);
   processedImage.value = undefined;
   operationDraggableItems.value = [];
 };

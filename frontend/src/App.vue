@@ -1,10 +1,18 @@
 <script lang="ts" setup>
+import { computed } from "vue";
+
+import { useImageProcessing } from "./composables/image-processing";
+import { useProjectManager } from "./composables/project-manager";
 import Navbar from "./components/Navbar.vue";
 import ImageViewer from "./components/ImageViewer.vue";
-import { useImageProcessing } from "./composables/image-processing";
 import OperationGroupManager from "./components/OperationGroupManager.vue";
 
-const { openImageFileSelector, processedImage, isLoading } = useImageProcessing();
+const { openImageFileSelector, processedImage, isLoading: isProcessingImage } = useImageProcessing();
+const { isLoading: isLoadingProject, isSaving: isSavingProject } = useProjectManager();
+
+const isLoadingDialogOpen = computed<boolean>(() => {
+  return isLoadingProject.value || isSavingProject.value;
+});
 
 const onSelectImage = async () => {
   try {
@@ -20,7 +28,7 @@ const onSelectImage = async () => {
     <Navbar id="navbar" />
 
     <v-progress-linear
-      v-if="isLoading"
+      v-if="processedImage && isProcessingImage"
       id="loading-indicator"
       :height="1"
       color="blue-lighten-3"
@@ -28,12 +36,13 @@ const onSelectImage = async () => {
       class="mt-8"
     />
 
-    <div v-if="!processedImage && isLoading" class="h-100 w-100 d-flex justify-center align-center">
+    <div v-if="!processedImage && isProcessingImage" class="h-100 w-100 d-flex justify-center align-center">
+      <v-progress-circular indeterminate color="blue-lighten-3" class="mr-3" />
       <h3>Please wait for image to load...</h3>
     </div>
 
     <v-btn
-      v-if="!processedImage && !isLoading"
+      v-if="!processedImage && !isProcessingImage"
       id="select-image-btn"
       variant="tonal"
       size="x-large"
@@ -51,6 +60,18 @@ const onSelectImage = async () => {
         <OperationGroupManager />
       </div>
     </main>
+
+    <v-dialog v-model="isLoadingDialogOpen" :scrim="false" persistent width="50%">
+      <v-card color="gray" class="d-flex">
+        <v-card-text>
+          <div class="mb-3">
+            <h3 v-if="isLoadingProject">Loading project...</h3>
+            <h3 v-if="isSavingProject">Saving project...</h3>
+          </div>
+          <v-progress-linear indeterminate color="blue-lighten-3" class="mb-2"></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 

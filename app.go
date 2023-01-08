@@ -71,6 +71,13 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+func (a *App) initProject(img *image.RGBA) {
+	a.originalImage = img
+
+	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
+	a.imageLayerCollection = imageLayerCollection
+}
+
 func (a *App) OpenImageFileSelector() bool {
 	filePath, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Select Image File (PNG or JPG)",
@@ -93,11 +100,7 @@ func (a *App) OpenImageFileSelector() bool {
 		panic(err)
 	}
 
-	a.originalImage = img
-
-	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
-	a.imageLayerCollection = imageLayerCollection
-
+	a.initProject(img)
 	return true
 }
 
@@ -132,10 +135,7 @@ func (a *App) SetOriginalImage(imageBase64 string) {
 		}
 	}
 
-	a.originalImage = rgbaImage
-
-	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
-	a.imageLayerCollection = imageLayerCollection
+	a.initProject(rgbaImage)
 }
 
 func (a *App) GetUserSelectedProjectFileContent() string {
