@@ -1,9 +1,11 @@
 import { ref, readonly } from "vue";
+import { nanoid } from "nanoid";
 
 import { main } from "../../wailsjs/go/models";
 import {
   OpenImageFileSelector,
   ProcessImage,
+  GetOriginalImage,
   SetOriginalImage,
   ResetAppState,
   AppendImageOperation,
@@ -19,8 +21,7 @@ import {
 import { ImageOperationDraggableItem } from "../types/image";
 
 const isLoading = ref<boolean>(false);
-const originalImage = ref<main.ProcessedImage | undefined>();
-const processedImage = ref<main.ProcessedImage | undefined>();
+const processedImage = ref<main.Base64Image | undefined>();
 const operationDraggableItems = ref<Array<ImageOperationDraggableItem>>([]);
 
 const setIsLoading = (value: boolean) => {
@@ -38,8 +39,6 @@ const openImageFileSelector = async () => {
     }
 
     const result = await ProcessImage(0);
-
-    originalImage.value = result;
     processedImage.value = result;
   } catch (err) {
     throw err;
@@ -48,27 +47,37 @@ const openImageFileSelector = async () => {
   }
 };
 
-const setOriginalImageBase64 = async (image: main.ProcessedImage) => {
-  // TODO: Improve
-  const base64 = image.base64.substring(image.base64.indexOf("base64,") + 7);
-  await SetOriginalImage(base64);
-  originalImage.value = image;
+const getOriginalImage = async () => {
+  return await GetOriginalImage();
+};
+
+const setOriginalImage = async (image: main.Base64Image) => {
+  const rawBase64 = image.base64.split(",")[1];
+  await SetOriginalImage(rawBase64);
 };
 
 const addImageOperation = async (operation: main.ImageOperation) => {
   await AppendImageOperation(operation);
+  operationDraggableItems.value.push({ id: nanoid(), operation, isEnabled: operation.isEnabled });
 };
 
 const removeImageOperation = async (index: number) => {
   await RemoveImageOperationAtIndex(index);
+  operationDraggableItems.value.splice(index, 1);
 };
 
-const updateImageOperation = async (index: number, operation: main.ImageOperation) => {
+const updateImageOperation = async (index: number, level?: number, tint?: main.TintRGB, kernelSize?: number) => {
+  const operation = operationDraggableItems.value[index].operation;
+  operation.level = level;
+  operation.tint = tint;
+  operation.kernelSize = kernelSize;
+
   await UpdateImageOperationAtIndex(index, operation);
 };
 
 const replaceImageOperation = async (index: number, operation: main.ImageOperation) => {
   await ReplaceImageOperationAtIndex(index, operation);
+  operationDraggableItems.value[index].operation.type = operation.type;
 };
 
 const moveImageOperation = async (oldIndex: number, newIndex: number) => {
@@ -78,8 +87,11 @@ const moveImageOperation = async (oldIndex: number, newIndex: number) => {
   await MoveImageOperation(oldIndex, newIndex);
 };
 
-const toggleImageOperation = async (index: number, enable: boolean) => {
-  await ToggleImageOperation(index, enable);
+const toggleImageOperation = async (index: number) => {
+  await ToggleImageOperation(index);
+
+  const { operation } = operationDraggableItems.value[index];
+  operation.isEnabled = !operation.isEnabled;
 };
 
 const rotateImageBy90Deg = async () => {
@@ -122,10 +134,10 @@ const resetAppState = async () => {
 export function useImageProcessing() {
   return {
     isLoading: readonly(isLoading),
-    originalImage: readonly(originalImage),
     processedImage: readonly(processedImage),
-    setOriginalImageBase64,
     operationDraggableItems,
+    getOriginalImage,
+    setOriginalImage,
     openImageFileSelector,
     addImageOperation,
     removeImageOperation,

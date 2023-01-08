@@ -3,12 +3,12 @@ import { ProjectState } from "../types/project";
 import { useImageProcessing } from "./image-processing";
 
 const {
-  originalImage,
   processedImage,
   operationDraggableItems,
   addImageOperation,
   resetAppState,
-  setOriginalImageBase64,
+  getOriginalImage,
+  setOriginalImage,
   processImage,
 } = useImageProcessing();
 
@@ -41,11 +41,9 @@ const loadProject = async () => {
 
   try {
     await resetAppState();
-    await setOriginalImageBase64(projectState.originalImage);
+    await setOriginalImage(projectState.originalImage);
 
-    operationDraggableItems.value = projectState.operations;
-
-    for (const { operation } of projectState.operations) {
+    for (const operation of projectState.operations) {
       await addImageOperation(operation);
     }
 
@@ -55,11 +53,13 @@ const loadProject = async () => {
   }
 };
 
-const saveProject = () => {
-  const projectState: ProjectState = { originalImage: originalImage.value!, operations: operationDraggableItems.value };
+const saveProject = async () => {
+  const originalImage = await getOriginalImage();
+  const operations = operationDraggableItems.value.map(({ operation }) => operation);
+  const projectState: ProjectState = { originalImage, operations };
+
   const jsonString = JSON.stringify(projectState);
   const file = new File([jsonString], "image-processing-project.goimp");
-
   downloadFile(file);
 };
 

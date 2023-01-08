@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import draggable from "vuedraggable";
-import { nanoid } from "nanoid";
 
 import { main } from "../../wailsjs/go/models";
 import TransformationActions from "./TransformationActions.vue";
@@ -29,8 +28,8 @@ const onAddOperation = async (type: ImageOperationType) => {
     level: 1,
     tint: { r: 0, g: 0, b: 255 },
     kernelSize: 3,
+    isEnabled: true,
   });
-  operationDraggableItems.value.push({ id: nanoid(), operation, isEnabled: true });
 
   try {
     await addImageOperation(operation);
@@ -43,7 +42,6 @@ const onAddOperation = async (type: ImageOperationType) => {
 const onRemoveOperation = async (index: number) => {
   try {
     await removeImageOperation(index);
-    operationDraggableItems.value.splice(index, 1);
 
     if (operationDraggableItems.value.length === index) {
       index -= 1;
@@ -54,10 +52,10 @@ const onRemoveOperation = async (index: number) => {
   }
 };
 
-const onToggleOperation = async (index: number, isEnabled: boolean) => {
+const onToggleOperation = async (index: number) => {
   try {
-    await toggleImageOperation(index, !isEnabled);
-    operationDraggableItems.value[index].isEnabled = !isEnabled;
+    await toggleImageOperation(index);
+    operationDraggableItems.value[index].isEnabled = !operationDraggableItems.value[index].isEnabled;
 
     await processImage(index);
   } catch (err) {
@@ -72,20 +70,15 @@ const onOperationChange = async (
   tint?: main.TintRGB,
   kernelSize?: number
 ) => {
-  const changedOperation = operationDraggableItems.value[index].operation;
+  const { isEnabled, type: previousType } = operationDraggableItems.value[index].operation;
+  const isTypeChanged = previousType !== type;
 
   try {
-    if (changedOperation.type === type) {
-      changedOperation.level = level;
-      changedOperation.tint = tint;
-      changedOperation.kernelSize = kernelSize;
-
-      await updateImageOperation(index, changedOperation);
-    } else {
-      const newOperation = new main.ImageOperation({ type, level, tint, kernelSize });
+    if (isTypeChanged) {
+      const newOperation = new main.ImageOperation({ type, level, tint, kernelSize, isEnabled });
       await replaceImageOperation(index, newOperation);
-
-      operationDraggableItems.value[index].operation.type = type;
+    } else {
+      await updateImageOperation(index, level, tint, kernelSize);
     }
 
     await processImage(index);
@@ -142,12 +135,12 @@ const onDragEnd = async ({ oldIndex, newIndex }: { oldIndex: number; newIndex: n
   >
     <template #item="{ element, index }">
       <OperationBuilder
-        :initial-operation-type="element.operation.type"
+        :initial-operation="element.operation"
         :is-enabled="element.isEnabled"
         class="mr-4"
         @change="(type, level, tint, kernelSize) => onOperationChange(index, type, level, tint, kernelSize)"
         @remove="() => onRemoveOperation(index)"
-        @toggle="() => onToggleOperation(index, element.isEnabled)"
+        @toggle="() => onToggleOperation(index)"
       />
     </template>
   </draggable>

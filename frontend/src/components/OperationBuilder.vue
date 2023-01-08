@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { PropType, ref, watch } from "vue";
 import Slider from "@vueform/slider";
 
 import { main } from "../../wailsjs/go/models";
@@ -7,8 +7,8 @@ import { useImageProcessing } from "../composables/image-processing";
 import { ImageOperationType, imageOperationSelectItems, rgbToHex } from "../types/image";
 
 const props = defineProps({
-  initialOperationType: {
-    type: Number,
+  initialOperation: {
+    type: Object as PropType<main.ImageOperation>,
     required: true,
   },
   isEnabled: {
@@ -24,11 +24,11 @@ const emit = defineEmits<{
 }>();
 
 const { isLoading } = useImageProcessing();
-const selectedOperationType = ref<ImageOperationType>(props.initialOperationType);
-const selectedLevel = ref<number>(1);
-const selectedTint = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
-const selectedKernelSize = ref<number>(3);
-const selectedColorPickerValue = ref<main.TintRGB>({ r: 0, g: 0, b: 255 });
+const selectedOperationType = ref<ImageOperationType>(props.initialOperation.type);
+const selectedLevel = ref<number>(props.initialOperation.level ?? 1);
+const selectedTint = ref<main.TintRGB>(props.initialOperation.tint ?? { r: 0, g: 0, b: 255 });
+const selectedKernelSize = ref<number>(props.initialOperation.kernelSize ?? 3);
+const selectedColorPickerValue = ref<main.TintRGB>(props.initialOperation.tint ?? { r: 0, g: 0, b: 255 });
 const isColorPickerOpen = ref<boolean>(false);
 
 const onRemove = () => emit("remove");

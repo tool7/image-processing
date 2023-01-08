@@ -6,6 +6,10 @@ export function AppendImageOperation(arg1) {
   return window['go']['main']['App']['AppendImageOperation'](arg1);
 }
 
+export function GetOriginalImage() {
+  return window['go']['main']['App']['GetOriginalImage']();
+}
+
 export function GetUserSelectedProjectFileContent() {
   return window['go']['main']['App']['GetUserSelectedProjectFileContent']();
 }
@@ -50,8 +54,8 @@ export function SetOriginalImage(arg1) {
   return window['go']['main']['App']['SetOriginalImage'](arg1);
 }
 
-export function ToggleImageOperation(arg1, arg2) {
-  return window['go']['main']['App']['ToggleImageOperation'](arg1, arg2);
+export function ToggleImageOperation(arg1) {
+  return window['go']['main']['App']['ToggleImageOperation'](arg1);
 }
 
 export function UpdateImageOperationAtIndex(arg1, arg2) {

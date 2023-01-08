@@ -1,5 +1,21 @@
 export namespace main {
 	
+	export class Base64Image {
+	    width: number;
+	    height: number;
+	    base64: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Base64Image(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.width = source["width"];
+	        this.height = source["height"];
+	        this.base64 = source["base64"];
+	    }
+	}
 	export class TintRGB {
 	    r: number;
 	    g: number;
@@ -21,6 +37,7 @@ export namespace main {
 	    level?: number;
 	    tint?: TintRGB;
 	    kernelSize?: number;
+	    isEnabled: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageOperation(source);
@@ -32,6 +49,7 @@ export namespace main {
 	        this.level = source["level"];
 	        this.tint = this.convertValues(source["tint"], TintRGB);
 	        this.kernelSize = source["kernelSize"];
+	        this.isEnabled = source["isEnabled"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -51,22 +69,6 @@ export namespace main {
 		    }
 		    return a;
 		}
-	}
-	export class ProcessedImage {
-	    width: number;
-	    height: number;
-	    base64: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new ProcessedImage(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.width = source["width"];
-	        this.height = source["height"];
-	        this.base64 = source["base64"];
-	    }
 	}
 
 }

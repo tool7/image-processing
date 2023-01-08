@@ -24,7 +24,7 @@ type App struct {
 	imageLayerCollection *models.ImageLayerCollection
 }
 
-type ProcessedImage struct {
+type Base64Image struct {
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 	Base64 string `json:"base64"`
@@ -60,6 +60,7 @@ type ImageOperation struct {
 	Level      float64            `json:"level,omitempty"`
 	Tint       TintRGB            `json:"tint,omitempty"`
 	KernelSize models.KernelSize  `json:"kernelSize,omitempty"`
+	IsEnabled  bool               `json:"isEnabled"`
 }
 
 func NewApp() *App {
@@ -100,6 +101,21 @@ func (a *App) OpenImageFileSelector() bool {
 	return true
 }
 
+func (a *App) GetOriginalImage() Base64Image {
+	var buff bytes.Buffer
+	png.Encode(&buff, a.originalImage)
+
+	rawBase64String := base64.StdEncoding.EncodeToString(buff.Bytes())
+	base64String := "data:image/png;base64,"
+	base64String += rawBase64String
+
+	return Base64Image{
+		Width:  a.originalImage.Bounds().Max.X - a.originalImage.Bounds().Min.X,
+		Height: a.originalImage.Bounds().Max.Y - a.originalImage.Bounds().Min.Y,
+		Base64: base64String,
+	}
+}
+
 func (a *App) SetOriginalImage(imageBase64 string) {
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(imageBase64))
 	decodedImage, _, err := image.Decode(reader)
@@ -108,7 +124,15 @@ func (a *App) SetOriginalImage(imageBase64 string) {
 		panic(err)
 	}
 
-	a.originalImage = decodedImage.(*image.RGBA)
+	rgbaImage := image.NewRGBA(decodedImage.Bounds())
+	for y := decodedImage.Bounds().Min.Y; y < decodedImage.Bounds().Max.Y; y++ {
+		for x := decodedImage.Bounds().Min.X; x < decodedImage.Bounds().Max.X; x++ {
+			r, g, b, a := utils.GetPixelColor(decodedImage, x, y)
+			rgbaImage.SetRGBA(x, y, color.RGBA{r, g, b, a})
+		}
+	}
+
+	a.originalImage = rgbaImage
 
 	imageLayerCollection := utils.NewImageLayerCollection(a.originalImage)
 	a.imageLayerCollection = imageLayerCollection
@@ -139,7 +163,7 @@ func (a *App) GetUserSelectedProjectFileContent() string {
 	return string(byteData)
 }
 
-func (a *App) ProcessImage(indexToExecuteFrom int) ProcessedImage {
+func (a *App) ProcessImage(indexToExecuteFrom int) Base64Image {
 	var buff bytes.Buffer
 
 	if a.imageLayerCollection.Size > 0 {
@@ -156,7 +180,7 @@ func (a *App) ProcessImage(indexToExecuteFrom int) ProcessedImage {
 	base64String := "data:image/png;base64,"
 	base64String += rawBase64String
 
-	return ProcessedImage{
+	return Base64Image{
 		Width:  a.originalImage.Bounds().Max.X - a.originalImage.Bounds().Min.X,
 		Height: a.originalImage.Bounds().Max.Y - a.originalImage.Bounds().Min.Y,
 		Base64: base64String,
@@ -174,6 +198,7 @@ func (a *App) AppendImageOperation(operation ImageOperation) error {
 		panic(err)
 	}
 
+	imageLayer.IsEnabled = operation.IsEnabled
 	a.imageLayerCollection.Append(imageLayer)
 
 	return nil
@@ -264,16 +289,16 @@ func (a *App) MoveImageOperation(oldIndex, newIndex int) error {
 	return nil
 }
 
-func (a *App) ToggleImageOperation(index int, enable bool) error {
+func (a *App) ToggleImageOperation(index int) error {
 	imageLayer, err := a.imageLayerCollection.At(index)
 	if err != nil {
 		panic(err)
 	}
 
-	if enable {
-		imageLayer.Enable()
-	} else {
+	if imageLayer.IsEnabled {
 		imageLayer.Disable()
+	} else {
+		imageLayer.Enable()
 	}
 
 	return nil
