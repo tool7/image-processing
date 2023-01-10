@@ -30,6 +30,14 @@ You can also use `wails build` command for compiling the project to executable.
 Implemented operations include `brightness`, `contrast`, `saturation`, `tint`, `greyscale`, `negative`, `sepia`, `box blur`, `motion blur`, `sharpen`, `emboss`, horizontal and vertical `edge detection`, and `outline`.
 Basic image transformations are also implemented: `rotation` (90°, 180°, -90°) and `mirroring` (horizontal and vertical).
 
+#### Limitations
+
+App cannot handle processing images that are too large, so for a good performance please select images that are Full HD (1080p) or below that.
+
+#### Potential optimizations
+
+Each operation could be processed on the so called “preview” image, a much smaller copy of the original image. The only part that needs to be done on the original image is exporting of PNG image. The problem that needs to be solved is with kernel operations - e.g. Blur operation would have a much larger effect on the smaller “preview” image compared to the result of processing original image (when exporting PNG) - reason being hardcoded kernel sizes.
+
 ---
 
 Thanks for checking this out! 😄
