@@ -22,11 +22,10 @@ const renderImage = () => {
   const img = new Image();
   img.src = props.base64;
 
-  // TODO: Find out why this is required for successful render
-  setTimeout(() => {
+  img.onload = () => {
     const ctx = canvasRef.value!.getContext("2d");
     ctx!.drawImage(img, 0, 0);
-  }, 0);
+  };
 };
 
 onMounted(() => {
